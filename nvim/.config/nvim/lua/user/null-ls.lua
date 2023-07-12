@@ -6,7 +6,7 @@ end
 
 local lsp_formatting = function(bufnr)
   vim.lsp.buf.format({
-    timeout = 3000,
+    timeout_ms = 6000,
     filter = function(client)
       return client.name == "null-ls"
     end,
