@@ -24,6 +24,7 @@ export ANDROID_HOME=$HOME/Library/Android/sdk
 PATH=""
 
 path+=$PNPM_HOME
+path+=~/.nvim-0.9/nvim-macos/bin # neovim 0.9
 path+=/opt/homebrew/opt/openjdk@11/bin # java 11, react native (old: 1.8)
 path+=~/.rbenv/shims # ruby version manager, for react native
 export PATH="$HOME/.jenv/bin:$PATH"
@@ -34,7 +35,6 @@ path+=/usr/bin
 path+=/usr/sbin
 path+=/bin
 path+=/sbin
-path+=~/.nvim8/nvim-macos/bin # temp, while testing nvim 0.8.0
 path+=/opt/homebrew/bin
 path+=/opt/homebrew/sbin
 path+=/opt/homebrew/opt/postgresql@12/bin
@@ -42,9 +42,6 @@ path+=~/.npm-global/bin
 path+=/Applications/kitty.app/Contents/MacOS
 path+=$ANDROID_HOME/emulator
 path+=$ANDROID_HOME/platform-tools
-
-
-
 
 export PATH
 

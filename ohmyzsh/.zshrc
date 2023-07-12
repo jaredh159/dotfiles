@@ -13,7 +13,7 @@ source $ZSH/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 source $HOME/.cargo/env # rust
 
 # enable completions for `just`
-eval "$(brew shellenv)"
+# eval "$(brew shellenv)"
 fpath=($HOMEBREW_PREFIX/share/zsh/site-functions $fpath)
 
 bindkey -s ^f "tmux-sessionizer.sh\n"
