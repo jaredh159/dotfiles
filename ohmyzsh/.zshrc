@@ -53,6 +53,12 @@ vims() {
   fi
 }
 
+sid() {
+  UUID=$(/usr/local/bin/uuid | perl -pe "s/\s//g" | perl -pe "s/-.*//");
+  printf $UUID | pbcopy;
+  printf "\n$UUID (copied to clipboard)\n\n";
+}
+
 uuid() {
   UUID=$(/usr/local/bin/uuid | perl -pe "s/\s//g");
   printf $UUID | pbcopy;
