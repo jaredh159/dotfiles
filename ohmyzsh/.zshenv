@@ -5,8 +5,9 @@ COLORTERM="truecolor"
 export GIT_EDITOR=nvim
 export EDITOR=nvim
 
-# prevent homebrew from running all updates on every upgrade
+# try to prevent homebrew from randomly breaking everything
 export HOMEBREW_NO_AUTO_UPDATE=1
+export HOMEBREW_NO_INSTALL_CLEANUP=1
 
 # keep on latest npm, no matter what node version is used
 export N_PRESERVE_NPM=1
