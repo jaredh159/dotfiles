@@ -151,6 +151,10 @@ nnoremap g. /\V\C<C-r>"<CR>cgn<C-a><Esc>
 nnoremap cn *``cgn
 nnoremap cN *``cgN
 
+" use rg for :grep
+set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
+set grepformat=%f:%l:%c:%m
+
 " folding
 set foldmethod=indent
 set foldlevelstart=99
