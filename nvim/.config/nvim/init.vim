@@ -134,6 +134,9 @@ nnoremap <leader>88 :silent !xcode-stop<CR>
 " -- custom homegrown command palette goodness
 nnoremap <leader>cp :CommandPalette<CR>
 
+" -- (s)cratch (p)ad
+nnoremap <leader>sp :e ~/gertie/project-notes/_scratch.md<CR>
+
 " -- whitespace highlighting
 let g:better_whitespace_ctermcolor='DarkRed'
 let g:better_whitespace_guicolor='DarkRed'
@@ -172,6 +175,6 @@ let @b="ea className=\"\"i"
 " @i convert to I-mplicit return
 let @i="f(%/{%ddx/returndaw"
 " @e convert to W-xplicit return
-let @e="f(%f(i{return l%lxa};"
+let @e="f(%f(i{const foo = 3; return l%lxa};"
 
 
