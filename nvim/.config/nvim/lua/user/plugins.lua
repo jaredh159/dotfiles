@@ -50,11 +50,9 @@ require("lazy").setup({
 
   -- LSP
   "neovim/nvim-lspconfig",
-  "williamboman/nvim-lsp-installer",
+  "williamboman/mason.nvim",
+  "williamboman/mason-lspconfig.nvim",
   "jose-elias-alvarez/null-ls.nvim",
-
-  -- prettier (do i need this? isn't null-ls handling it?)
-  -- use("prettier/vim-prettier")
 
   -- for closing buffers
   "Asheq/close-buffers.vim",
