@@ -114,9 +114,6 @@ nnoremap <silent> <leader>wa :silent! wa!<CR> <bar> :echo "Wrote all writable bu
 " -- write all writable buffers, ignoring unnamed and non-writable, then quit
 nnoremap <silent> <leader>xx :silent! wa!<CR> <bar> :echo "Wrote all writable buffers"<CR> <bar> :qa!<CR>
 
-" -- start a local Rename
-nnoremap <silent> <leader>rr @r
-
 " -- show code actions
 nnoremap <leader>aa :lua vim.lsp.buf.code_action()<CR>
 
@@ -168,13 +165,11 @@ set foldnestmax=19
 let @d="f{xr\"f`xr\"j^"
 " @c wrap classnames prop in cx
 let @c="f\"s{cx(`f\"s`, className)}"
-" @c start a local rename
-let @r="*Nciw"
 " @b add className prop
 let @b="ea className=\"\"i"
 " @i convert to I-mplicit return
 let @i="f(%/{%ddx/returndaw"
-" @e convert to W-xplicit return
+" @e convert to E-xplicit return
 let @e="f(%f(i{const foo = 3; return l%lxa};"
 
 
