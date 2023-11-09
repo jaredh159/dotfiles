@@ -8,6 +8,10 @@ local action_state = require("telescope.actions.state")
 local commands = {
   { "git blame line", ":Gitsigns blame_line" },
   { "copy current file path", ':let @+ = expand("%:p")' },
+  { "convert to ‘ [", ":norm hr‘l" },
+  { "convert to ’ ] (apos)", ":norm hr’l" },
+  { "convert to “ [", ":norm hr“l" },
+  { "convert to ” ]", ":norm hr”l" },
 }
 
 --------------------------------
