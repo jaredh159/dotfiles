@@ -92,3 +92,18 @@ alias cowpath="echo $PATH | perl -pe 's/:/\n/g' | cowsay"
 alias back="cd -"
 alias ndate="node -e \"process.stdout.write(new Date().toISOString())\" | pbcopy"
 alias grep="rg"
+
+# bun completions
+[ -s "/Users/jared/.bun/_bun" ] && source "/Users/jared/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+# pnpm
+export PNPM_HOME="/Users/jared/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end

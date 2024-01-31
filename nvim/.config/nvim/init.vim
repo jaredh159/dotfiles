@@ -16,6 +16,7 @@ lua require("user.null-ls")
 lua require("user.cmp")
 lua require("user.lsp")
 lua require("user.command-palette")
+lua require("user.harpoon")
 
 " todo: switch whole file to lua
 " options should go after plugins, to prevent plugins from setting stuff
