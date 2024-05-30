@@ -45,6 +45,21 @@ nnoremap : ;
 vnoremap ; :
 vnoremap : ;
 
+" " no arrows for huck!
+" noremap <Up> :echo "use K huck!"<CR>
+" inoremap <Up> <Nop>
+" vnoremap <Up> <Nop>
+" noremap <Down> :echo "use J huck!"<CR>
+" inoremap <Down> <Nop>
+" vnoremap <Down> <Nop>
+" noremap <Left> :echo "use H huck!"<CR>
+" inoremap <Left> <Nop>
+" vnoremap <Left> <Nop>
+" noremap <Right> :echo "use L huck!"<CR>
+" inoremap <Right> <Nop>
+" vnoremap <Right> <Nop>
+" set norelativenumber
+
 " alt for save, try to prevent always adding `;w` when i'm typing super fast
 nnoremap <C-s> :w<CR>
 
