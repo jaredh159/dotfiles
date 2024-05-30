@@ -18,6 +18,9 @@ fpath=($HOMEBREW_PREFIX/share/zsh/site-functions $fpath)
 
 bindkey -s ^f "tmux-sessionizer.sh\n"
 
+# atuin
+eval "$(atuin init zsh --disable-up-arrow)"
+
 # fixes kitty + tmux for some reason...
 unset MANPATH
 
