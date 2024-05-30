@@ -45,6 +45,7 @@ vim.opt.splitbelow = true
 vim.opt.splitright = true
 
 vim.opt.cursorline = true
+vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#e08a58" })
 
 -- faster completion (4000ms default)
 vim.opt.updatetime = 300
