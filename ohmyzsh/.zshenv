@@ -31,6 +31,8 @@ path+=~/.rbenv/shims # ruby version manager, for react native
 export PATH="$HOME/.jenv/bin:$PATH"
 path+=~/.local/scripts
 path+=/usr/local/bin
+path+=/usr/.local/bin # for haskell stack
+path+=$HOME/.ghcup/bin
 path+=/usr/local/sbin
 path+=/usr/bin
 path+=/usr/sbin
@@ -46,3 +48,5 @@ path+=$ANDROID_HOME/platform-tools
 
 export PATH
 
+# haskell
+[ -f "/Users/jared/.ghcup/env" ] && . "/Users/jared/.ghcup/env"
