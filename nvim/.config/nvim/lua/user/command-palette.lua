@@ -37,7 +37,7 @@ local command_palette = function(opts)
           actions.close(prompt_bufnr)
           local selection = action_state.get_selected_entry()
           -- print(vim.inspect(selection))
-          vim.api.nvim_exec(selection.value[2], true)
+          vim.api.nvim_exec2(selection.value[2], { output = true })
         end)
         return true
       end,

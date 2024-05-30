@@ -137,7 +137,6 @@ nnoremap <leader>aa :lua vim.lsp.buf.code_action()<CR>
 nnoremap <silent> <leader>cc @b
 
 " -- restart lsp
-" nnoremap <leader>ll :LspStop<CR> <bar> :LspStart<CR>
 nnoremap <leader>ll :LspRestart<CR>
 
 " -- xcode run/stox
@@ -149,6 +148,9 @@ nnoremap <leader>cp :CommandPalette<CR>
 
 " -- (s)cratch (p)ad
 nnoremap <leader>sp :e ~/gertie/project-notes/_scratch.md<CR>
+
+" -- toggle inlay hints
+nnoremap <leader>ii :lua vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())<CR>
 
 " -- whitespace highlighting
 let g:better_whitespace_ctermcolor='DarkRed'

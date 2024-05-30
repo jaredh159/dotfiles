@@ -22,7 +22,7 @@ local function settings(lsp)
   return vim.tbl_deep_extend("force", require("user.lsp.settings." .. lsp), opts)
 end
 
-lspconfig.sourcekit.setup(opts)
+lspconfig.sourcekit.setup(settings("sourcekit"))
 lspconfig.tsserver.setup(settings("tsserver"))
 lspconfig.jsonls.setup(settings("jsonls"))
 lspconfig.lua_ls.setup(settings("lua_ls"))
