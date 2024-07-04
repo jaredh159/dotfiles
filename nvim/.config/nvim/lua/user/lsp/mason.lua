@@ -24,6 +24,7 @@ local function settings(lsp)
 end
 
 lspconfig.hls.setup(opts)
+lspconfig.astro.setup(opts)
 lspconfig.sourcekit.setup(settings("sourcekit"))
 lspconfig.tsserver.setup(settings("tsserver"))
 lspconfig.jsonls.setup(settings("jsonls"))

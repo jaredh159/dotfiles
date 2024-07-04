@@ -16,6 +16,7 @@ configs.setup({
     "javascript",
     "lua",
     "make",
+    "astro",
     "markdown",
     "markdown_inline",
     "graphql",
