@@ -12,6 +12,7 @@ local commands = {
   { "convert to ’ ] (apos)", ":norm hr’l" },
   { "convert to “ [", ":norm hr“l" },
   { "convert to ” ]", ":norm hr”l" },
+  { "convert to — (mdash)", ":norm hr—l" },
 }
 
 --------------------------------
