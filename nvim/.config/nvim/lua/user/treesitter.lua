@@ -20,6 +20,7 @@ configs.setup({
     "markdown",
     "markdown_inline",
     "graphql",
+    "haskell",
     "bash",
     "cpp",
   },
