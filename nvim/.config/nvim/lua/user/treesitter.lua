@@ -11,6 +11,7 @@ end
 configs.setup({
   ensure_installed = { -- or "all"
     "rust",
+    "zig",
     "swift",
     "typescript",
     "tsx",

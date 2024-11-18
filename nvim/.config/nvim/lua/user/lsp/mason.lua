@@ -5,6 +5,7 @@ require("mason").setup({
 require("mason-lspconfig").setup({
   ensure_installed = {
     "jsonls",
+    "zls",
     "lua_ls",
     "tsserver",
     "rust_analyzer",
@@ -24,6 +25,7 @@ local function settings(lsp)
 end
 
 lspconfig.hls.setup(opts)
+lspconfig.zls.setup(opts)
 lspconfig.astro.setup(opts)
 lspconfig.sourcekit.setup(settings("sourcekit"))
 lspconfig.tsserver.setup(settings("tsserver"))
