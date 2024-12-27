@@ -7,6 +7,8 @@ require("harpoon").setup({
   },
 })
 
+require("hurl").setup()
+
 -- "Harpoon Add"
 keymap("n", "<leader>ha", '<cmd>lua require("harpoon.mark").add_file()<CR>', opts)
 

@@ -36,6 +36,9 @@ require("lazy").setup({
   -- current colorscheme
   "folke/tokyonight.nvim",
 
+  -- hurl
+  "samueljoli/hurl.nvim",
+
   -- completion
   "hrsh7th/nvim-cmp",
   "hrsh7th/cmp-buffer", -- buffer completions
