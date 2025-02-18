@@ -1,2 +1,9 @@
 background = 000000
 font-size = 19
+font-family = FiraCode Nerd Font Mono
+font-family-italic = Hack Nerd Font Mono Italic
+font-thicken = false
+font-thicken-strength = 16
+mouse-hide-while-typing
+keybind = global:cmd+shift+t=toggle_quick_terminal
+link-url

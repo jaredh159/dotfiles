@@ -62,6 +62,11 @@ sid() {
   printf "\n$UUID (copied to clipboard)\n\n";
 }
 
+ssid() {
+  UUID=$(/usr/local/bin/uuid | perl -pe "s/\s//g" | perl -pe "s/-.*//");
+  printf $UUID
+}
+
 uuid() {
   UUID=$(/usr/local/bin/uuid | perl -pe "s/\s//g");
   printf $UUID | pbcopy;
