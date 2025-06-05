@@ -81,8 +81,6 @@ alias fell="/Users/jared/mfl/node_modules/.bin/ts-node \
   --project /Users/jared/mfl/apps/fell/tsconfig.json \
   /Users/jared/mfl/apps/fell/src/app.ts ${@}"
 
-alias tree='tree -I "node_modules|target|.git|.build|.spm"'
-  #
 # misc aliases
 alias issue="gh issue create --repo gertrude-app/project"
 alias vim="nvim"
@@ -102,6 +100,8 @@ alias cowpath="echo $PATH | perl -pe 's/:/\n/g' | cowsay"
 alias back="cd -"
 alias ndate="node -e \"process.stdout.write(new Date().toISOString())\" | pbcopy"
 alias grep="rg"
+alias tailpg="tail -f /opt/homebrew/var/log/postgresql@17.log"
+alias tree='tree -I "node_modules|target|.git|.build|.spm"'
 
 # bun completions
 [ -s "/Users/jared/.bun/_bun" ] && source "/Users/jared/.bun/_bun"
