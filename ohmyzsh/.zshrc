@@ -80,6 +80,8 @@ alias fl="/Users/jared/mfl/node_modules/.bin/ts-node \
 alias fell="/Users/jared/mfl/node_modules/.bin/ts-node \
   --project /Users/jared/mfl/apps/fell/tsconfig.json \
   /Users/jared/mfl/apps/fell/src/app.ts ${@}"
+
+alias tree='tree -I "node_modules|target|.git|.build|.spm"'
   #
 # misc aliases
 alias issue="gh issue create --repo gertrude-app/project"

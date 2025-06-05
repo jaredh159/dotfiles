@@ -21,13 +21,16 @@ export PNPM_HOME="$HOME/Library/pnpm"
 # android (react-native)
 export ANDROID_HOME=$HOME/Library/Android/sdk
 
+# swift/gertrude
+export TASK_MEGA_YIELD_COUNT=100
+
 # clear out the path, start brand new
 PATH=""
 
 path+=$PNPM_HOME
 # path+=~/.nvim-0.10/nvim-macos-arm64/bin # neovim 0.10
 path+=~/.nvim-0.10.3/nvim-macos-arm64/bin # neovim 0.10.3
-path+=~/.zig-0.14.0
+path+=~/.zig-0.15.0
 path+=/opt/homebrew/opt/openjdk@11/bin # java 11, react native (old: 1.8)
 path+=~/.rbenv/shims # ruby version manager, for react native
 export PATH="$HOME/.jenv/bin:$PATH"
@@ -48,6 +51,7 @@ path+=~/.npm-global/bin
 path+=/Applications/kitty.app/Contents/MacOS
 path+=$ANDROID_HOME/emulator
 path+=$ANDROID_HOME/platform-tools
+path+=~/.lmstudio/bin
 
 export PATH
 

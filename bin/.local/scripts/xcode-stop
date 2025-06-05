@@ -10,7 +10,7 @@ end tell
 
 delay 0.1
 
-tell application "Kitty"
+tell application "Ghostty"
   activate
 end tell
 
