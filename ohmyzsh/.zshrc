@@ -102,6 +102,7 @@ alias ndate="node -e \"process.stdout.write(new Date().toISOString())\" | pbcopy
 alias grep="rg"
 alias tailpg="tail -f /opt/homebrew/var/log/postgresql@17.log"
 alias tree='tree -I "node_modules|target|.git|.build|.spm"'
+alias j='/Users/jared/playground/lgit/target/debug/lgit "$@"'
 
 # bun completions
 [ -s "/Users/jared/.bun/_bun" ] && source "/Users/jared/.bun/_bun"
