@@ -46,3 +46,7 @@ vim.api.nvim_set_keymap("i", "<C-j>", "copilot#Next()", { noremap = true, silent
 -- keymap("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
 -- keymap("n", "gh", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
 -- keymap("n", "<C-k>", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
+
+vim.keymap.set("n", "<leader>tt", function()
+  require("user.diagnostics_to_quickfix").errors_to_quickfix()
+end, { desc = "LSP errors to quickfix" })
