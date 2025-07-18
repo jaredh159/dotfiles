@@ -125,4 +125,3 @@ esac
 # pnpm end
 
 . "$HOME/.local/bin/env"
-
