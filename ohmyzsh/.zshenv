@@ -28,8 +28,8 @@ export TASK_MEGA_YIELD_COUNT=100
 PATH=""
 
 path+=$PNPM_HOME
-# path+=~/.nvim-0.10/nvim-macos-arm64/bin # neovim 0.10
-path+=~/.nvim-0.10.3/nvim-macos-arm64/bin # neovim 0.10.3
+# path+=~/.nvim-0.10.3/nvim-macos-arm64/bin # neovim 0.10.3
+path+=~/.nvim-0.11.3/nvim-macos-arm64/bin # neovim 0.11.3
 path+=~/.zig-0.15.0
 path+=/opt/homebrew/opt/openjdk@11/bin # java 11, react native (old: 1.8)
 path+=~/.rbenv/shims # ruby version manager, for react native
