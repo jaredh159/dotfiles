@@ -41,3 +41,6 @@ vim.keymap.set("n", "<leader>ff", "<cmd>Telescope live_grep<CR>", { desc = "Live
 
 -- tmux sessionizer
 vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer.sh<CR>", { desc = "Open tmux sessionizer" })
+
+-- custom homegown command palette goodness
+vim.keymap.set("n", "<leader>cp", ":CommandPalette<CR>", { desc = "Toggle custom command palette" })
