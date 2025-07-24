@@ -19,6 +19,27 @@ vim.opt.expandtab = true
 vim.opt.autoindent = true
 vim.opt.smarttab = true
 
+vim.api.nvim_create_augroup("filetype", { clear = true })
+
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+  group = "filetype",
+  pattern = "*.swift",
+  callback = function()
+    vim.bo.filetype = "swift"
+    vim.bo.shiftwidth = 2
+    vim.bo.tabstop = 2
+  end,
+})
+
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+  group = "filetype",
+  pattern = "*.rs",
+  callback = function()
+    vim.bo.shiftwidth = 2
+    vim.bo.tabstop = 2
+  end,
+})
+
 vim.opt.termguicolors = true
 vim.opt.swapfile = false
 vim.g.have_nerd_font = true
@@ -154,6 +175,8 @@ require("lazy").setup({
       },
     },
   },
+
+  "keith/swift", -- swift
 
   { -- nvim tree
     "nvim-tree/nvim-tree.lua",
@@ -388,6 +411,8 @@ require("lazy").setup({
       "saghen/blink.cmp",
     },
     config = function()
+      local lspc = require("lspconfig")
+      lspc.sourcekit.setup({})
       --  This function gets run when an LSP attaches to a particular buffer.
       --    That is to say, every time a new file is opened that is associated with
       --    an lsp (for example, opening `main.rs` is associated with `rust_analyzer`) this
@@ -572,7 +597,9 @@ require("lazy").setup({
       -- for you, so that they are available from within Neovim.
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
-        "stylua", -- Used to format Lua code
+        "stylua",
+        "jsonls",
+        "zls",
       })
       require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
@@ -742,11 +769,7 @@ require("lazy").setup({
     priority = 1000, -- Make sure to load this before all the other start plugins.
     config = function()
       ---@diagnostic disable-next-line: missing-fields
-      require("tokyonight").setup({
-        styles = {
-          comments = { italic = false }, -- Disable italics in comments
-        },
-      })
+      require("tokyonight").setup({})
 
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
