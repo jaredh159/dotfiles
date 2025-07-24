@@ -12,10 +12,16 @@ vim.keymap.set("n", "<leader>ss", ":Obsession Session.vim<CR>", { desc = "[S]tar
 vim.keymap.set("n", "<C-b>", ":NvimTreeToggle<CR>", { desc = "Toggle nvim-tree" })
 vim.keymap.set("n", "<leader>sf", ":NvimTreeFindFile<CR>", { desc = "Find file in nvim-tree" })
 
+-- custom save stuff
+vim.keymap.set("n", "<leader>wa", ':silent! wa! | echo "Wrote all writable buffers"<CR>', {
+  silent = true,
+  desc = "Write all writable",
+})
 vim.keymap.set("n", "<leader>xx", ':silent! wa! | echo "Wrote all writable buffers" | qa!<CR>', {
   silent = true,
   desc = "Write all writable buffers then quit",
 })
+vim.keymap.set("n", "<C-s>", ":w<CR>", { desc = "Save current file" })
 
 -- copy to system clipboard
 vim.keymap.set("v", "<leader>y", '"+y', { desc = "Copy to system clipboard" })
@@ -39,16 +45,11 @@ vim.keymap.set(
 )
 vim.keymap.set("n", "<leader>ff", "<cmd>Telescope live_grep<CR>", { desc = "Live grep search" })
 
+-- C-\ to open a vertical split
+vim.keymap.set("n", "<C-\\>", "<cmd>vsplit<CR>", { desc = "Vertical split" })
+
 -- tmux sessionizer
 vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer.sh<CR>", { desc = "Open tmux sessionizer" })
 
 -- custom homegown command palette goodness
 vim.keymap.set("n", "<leader>cp", ":CommandPalette<CR>", { desc = "Toggle custom command palette" })
-
---
--- vim.api.nvim_set_keymap(
---   "i",
---   "<C-l>",
---   ':copilot#Accept("<CR>")',
---   { desc = "Accept Copilot suggestion", silent = false, expr = true }
--- )
