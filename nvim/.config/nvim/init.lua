@@ -301,5 +301,6 @@ require("lazy").setup({
 })
 
 require("config.copilot")
+require("config.swift")
 require("plugins.lualine")
 require("plugins.command-palette")
