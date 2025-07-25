@@ -33,6 +33,12 @@ vim.o.scrolloff = 12
 vim.o.sidescrolloff = 8
 vim.o.cursorline = true -- show which line cursor is on
 
+-- fewer, shorter messages
+vim.o.shortmess = "ac"
+
+-- make search/replace global by default
+vim.o.gdefault = true
+
 -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
 vim.o.ignorecase = true
 vim.o.smartcase = true
