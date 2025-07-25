@@ -52,7 +52,26 @@ return { -- Fuzzy Finder (files, lsp, etc)
       --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
       --   },
       -- },
-      -- pickers = {}
+      pickers = {
+        live_grep = {
+          additional_args = function()
+            -- https://github.com/BurntSushi/ripgrep/issues/340#issuecomment-280868301
+            return {
+              "--hidden", -- allows for searching inside .config/ in dotfiles dir
+              "-g",
+              "!.git/",
+              "-g",
+              "!node_modules/",
+              "-g",
+              "!bundled/",
+              "-g",
+              "!.oh-my-zsh/",
+              "-g",
+              "!automatic_backups/",
+            }
+          end,
+        },
+      },
       extensions = {
         ["ui-select"] = {
           require("telescope.themes").get_dropdown(),
