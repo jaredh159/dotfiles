@@ -39,6 +39,7 @@ require("lazy").setup({
   "nvim-lualine/lualine.nvim",
   "tpope/vim-obsession",
   "github/copilot.vim",
+  "Asheq/close-buffers.vim",
   require("plugins.lsp"),
   require("plugins.toggleterm"),
   require("plugins.telescope"),
@@ -50,6 +51,7 @@ require("lazy").setup({
   require("plugins.treesitter"),
   require("plugins.tokyonight"),
   require("plugins.todo-comments"),
+  require("plugins.autopairs"),
 }, {
   -- empty icons = will use nerd font
   ui = { icons = {} },
