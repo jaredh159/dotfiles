@@ -2,28 +2,11 @@ return { -- Autoformat
   "stevearc/conform.nvim",
   event = { "BufWritePre" },
   cmd = { "ConformInfo" },
-
-  config = function()
-    require("conform").formatters.eslint_d = {
-      append_args = {
-        "--rule",
-        "@typescript-eslint/no-unused-vars: warn",
-        "--rule",
-        "@typescript-eslint/quotes: off",
-        "--rule",
-        "no-only-tests/no-only-tests: off",
-        "--ignore-pattern",
-        "'!**/.storybook/**/*'",
-        "--cache",
-      },
-    }
-  end,
-
   keys = {
     {
       "<leader>f",
       function()
-        require("conform").format({ async = true, lsp_format = "never" })
+        require("conform").format({ async = true, lsp_format = "fallback" })
       end,
       mode = "",
       desc = "[F]ormat buffer",
@@ -45,13 +28,11 @@ return { -- Autoformat
         }
       end
     end,
-    log_level = vim.log.levels.DEBUG,
     formatters_by_ft = {
       lua = { "stylua" },
       swift = { "swiftformat" },
       rust = { "rustfmt" },
       -- not sure these are right?
-      jsx = { "prettier", "eslint" },
       typescriptreact = { "prettier", "eslint_d" },
       javascript = { "prettier", "eslint_d" },
       typescript = { "prettier", "eslint_d" },
