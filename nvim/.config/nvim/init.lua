@@ -246,3 +246,8 @@ require("config.copilot")
 require("config.swift")
 require("plugins.lualine")
 require("plugins.command-palette")
+--
+-- diagnostic quickfix custom plugin
+vim.keymap.set("n", "<leader>tt", function()
+  require("plugins.diagnostic-quickfix").errors_to_quickfix()
+end, { desc = "LSP errors to quickfix" })
