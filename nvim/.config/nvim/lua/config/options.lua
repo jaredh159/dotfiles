@@ -9,24 +9,14 @@ vim.opt.expandtab = true
 vim.opt.autoindent = true
 vim.opt.smarttab = true
 
-vim.api.nvim_create_augroup("filetype", { clear = true })
-
-vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
-  group = "filetype",
-  pattern = "*.swift",
-  callback = function()
-    vim.bo.filetype = "swift"
-    vim.bo.shiftwidth = 2
-    vim.bo.tabstop = 2
-  end,
-})
-
-vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
-  group = "filetype",
-  pattern = "*.rs",
+-- rust and swift need special help to stick to my 2 space weirdness
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "swift", "rust" },
   callback = function()
     vim.bo.shiftwidth = 2
     vim.bo.tabstop = 2
+    vim.bo.expandtab = true
+    vim.bo.softtabstop = 2
   end,
 })
 
