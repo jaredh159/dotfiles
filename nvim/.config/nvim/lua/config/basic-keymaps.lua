@@ -89,3 +89,11 @@ vim.keymap.set("n", "<leader>sp", ":e ~/gertie/project-notes/_scratch.md<CR>", {
 vim.keymap.set("n", "<leader>ii", function()
   vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
 end, { desc = "Toggle inlay hints" })
+
+-- quickfix enter closes window
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "qf",
+  callback = function()
+    vim.keymap.set("n", "<CR>", "<CR>:cclose<CR>", { buffer = true })
+  end,
+})
