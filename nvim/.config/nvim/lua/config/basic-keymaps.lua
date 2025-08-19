@@ -85,6 +85,9 @@ vim.keymap.set("n", "<leader>sp", ":e ~/gertie/project-notes/_scratch.md<CR>", {
   desc = "Open scratchpad for project notes",
 })
 
+-- code actions
+vim.keymap.set("n", "<leader>aa", vim.lsp.buf.code_action, { desc = "Code action" })
+
 -- inlinay hints
 vim.keymap.set("n", "<leader>ii", function()
   vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())

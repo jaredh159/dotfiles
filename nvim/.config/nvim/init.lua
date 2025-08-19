@@ -40,6 +40,7 @@ require("lazy").setup({
   "tpope/vim-obsession",
   "github/copilot.vim",
   "Asheq/close-buffers.vim",
+  "kosayoda/nvim-lightbulb",
   require("plugins.lsp"),
   require("plugins.toggleterm"),
   require("plugins.telescope"),
@@ -60,6 +61,7 @@ require("lazy").setup({
 require("config.copilot")
 require("config.swift")
 require("plugins.lualine")
+require("plugins.lightbulb")
 require("plugins.command-palette")
 --
 -- diagnostic quickfix custom plugin

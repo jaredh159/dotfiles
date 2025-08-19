@@ -4,7 +4,9 @@ return { -- Highlight todo, notes, etc in comments
   dependencies = { "nvim-lua/plenary.nvim" },
   opts = {
     signs = false,
-    keywords = { NB = { icon = " ", color = "hint" } },
+    keywords = {
+      NB = { icon = " ", color = "hint" },
+      CONVENTION = { icon = " ", color = "warning" },
+    },
   },
 }
-

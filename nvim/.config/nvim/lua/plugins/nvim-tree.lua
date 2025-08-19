@@ -8,6 +8,7 @@ return {
       indent_width = 1,
       icons = { show = { git = false } },
     },
+    trash = { cmd = "trash" },
     diagnostics = { enable = true },
     actions = { open_file = { window_picker = { enable = false } } },
     filters = {
