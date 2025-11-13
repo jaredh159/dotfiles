@@ -32,10 +32,14 @@ return { -- Autoformat
       lua = { "stylua" },
       swift = { "swiftformat" },
       rust = { "rustfmt" },
-      -- not sure these are right?
-      typescriptreact = { "prettier", "eslint_d" },
+      -- web formats
+      html = { "prettier" },
+      markdown = { "prettier" },
+      mdx = { "prettier" },
       javascript = { "prettier", "eslint_d" },
+      javascriptreact = { "prettier", "eslint_d" },
       typescript = { "prettier", "eslint_d" },
+      typescriptreact = { "prettier", "eslint_d" },
     },
   },
 }

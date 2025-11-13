@@ -90,7 +90,6 @@ alias issue="gh issue create --repo gertrude-app/project"
 alias vim="nvim"
 alias vi="/usr/bin/vim"
 alias ksh="kitty +kitten ssh"
-alias st='~/jaredh159/Swiftest/.build/debug/Swiftest'
 alias lnhelp='cat ~/.lnhelp'
 alias taghelp='cat ~/.taghelp'
 alias run='npm run "$@"'
@@ -108,6 +107,8 @@ alias tailpg="tail -f /opt/homebrew/var/log/postgresql@17.log"
 alias tree='tree -I "node_modules|target|.git|.build|.spm"'
 alias j='/Users/jared/playground/lgit/target/debug/lgit "$@"'
 alias jsondiff='pdiffjson --sort-arrays'
+alias sombrero='/Users/jared/playground/sombrero/target/release/sombrero -v "$@"'
+alias bacon='CARGO_TARGET_DIR=target_bacon bacon "$@"'
 
 # bun completions
 [ -s "/Users/jared/.bun/_bun" ] && source "/Users/jared/.bun/_bun"
@@ -125,3 +126,8 @@ esac
 # pnpm end
 
 . "$HOME/.local/bin/env"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/jared/.lmstudio/bin"
+# End of LM Studio CLI section
+

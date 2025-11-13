@@ -44,10 +44,6 @@ return {
           --  Most Language Servers support renaming across files, etc.
           map("grn", vim.lsp.buf.rename, "[R]e[n]ame")
 
-          -- Execute a code action, usually your cursor needs to be on top of an error
-          -- or a suggestion from your LSP for this to activate.
-          map("gra", vim.lsp.buf.code_action, "[G]oto Code [A]ction", { "n", "x" })
-
           -- map leader e to open diagnostic float
           map("<leader>e", vim.diagnostic.open_float, "Open Diagnostic Float")
 
@@ -218,6 +214,7 @@ return {
         "stylua",
         "jsonls",
         "zls",
+        "gopls",
       })
       require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
