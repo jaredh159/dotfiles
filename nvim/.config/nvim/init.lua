@@ -6,6 +6,13 @@ vim.g.loaded_netrwPlugin = 1
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+-- Recognize .env variants (.env.local, .env.example, etc.) as dotenv files
+vim.filetype.add({
+  pattern = {
+    ["%.env%..*"] = "sh",
+  },
+})
+
 require("config.options")
 require("config.basic-keymaps")
 
