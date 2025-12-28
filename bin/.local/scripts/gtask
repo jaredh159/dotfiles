@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+TASKS_DIR="$HOME/gertie/tasks"
+
+clean_merged() {
+  if [[ ! -d "$TASKS_DIR" ]]; then
+    echo "Tasks directory not found: $TASKS_DIR"
+    exit 1
+  fi
+
+  for dir in "$TASKS_DIR"/*/; do
+    [[ -d "$dir" ]] || continue
+
+    dirname=$(basename "$dir")
+    # extract branch name (everything before the --date suffix)
+    branch="${dirname%%--*}"
+
+    if [[ -z "$branch" ]]; then
+      continue
+    fi
+
+    # check if branch was merged via gh CLI
+    merged=$(gh pr list \
+      --repo gertrude-app/gertrude \
+      --head "$branch" \
+      --state merged \
+      --json number \
+      --jq 'length' 2>/dev/null || echo "0")
+
+    if [[ "$merged" -gt 0 ]]; then
+      echo "Cleaning up merged branch: $branch ($dirname)"
+
+      # kill tmux session if it exists (ignore errors)
+      tmux kill-session -t "$dirname" 2>/dev/null || true
+
+      # remove the directory
+      rm -rf "$dir"
+      echo "  Removed: $dir"
+    else
+      echo "Skipping (not merged): $branch"
+    fi
+  done
+}
+
+# handle --clean flag
+if [[ "${1:-}" == "--clean" ]]; then
+  clean_merged
+  exit 0
+fi
+
+slug="${1:-}"
+
+if [[ -z "$slug" ]]; then
+  echo "usage: gtask <slug>"
+  echo "       gtask --clean"
+  exit 1
+fi
+
+datestamp=$(date +"%m-%d-%Y")
+target="$TASKS_DIR/${slug}--${datestamp}"
+
+if [ -d "$target/.git" ]; then
+  echo "Target already exists: $target"
+  exit 1
+fi
+
+git clone git@github.com:gertrude-app/gertrude.git "$target"
+git -C "$target" checkout -b "$slug"
+
+cp ~/gertie/swift/api/.env "$target/swift/api/.env"
+cp ~/gertie/web/dash/app/.env.local "$target/web/dash/app/.env.local"
+cp ~/gertie/web/site/.env.local "$target/web/site/.env.local"
+
+(
+  cd "$target/swift"
+  just migrate-up
+  pnpm install
+  git restore -- pnpm-lock.yaml
+
+  cd "$target/web"
+  pnpm install
+) > /dev/null 2>&1 &
+disown
+
+echo "Created: $target"
