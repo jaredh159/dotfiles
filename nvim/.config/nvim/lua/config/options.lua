@@ -21,6 +21,9 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 vim.opt.termguicolors = true
+
+-- Disable dimming of inactive/cfg-disabled code from rust-analyzer semantic tokens
+vim.api.nvim_set_hl(0, "@lsp.mod.inactive", {})
 vim.opt.swapfile = false
 vim.g.have_nerd_font = true
 vim.o.mouse = "a"

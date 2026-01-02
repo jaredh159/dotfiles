@@ -182,10 +182,12 @@ return {
         -- See `:help lspconfig-all` for a list of all the pre-configured LSPs
         rust_analyzer = {
           settings = {
-            hint = { enable = true },
-            checkOnSave = { command = "clippy" },
-            cargo = { features = "all" },
-            diagnostics = { disabled = { "macro-error" } },
+            ["rust-analyzer"] = {
+              hint = { enable = true },
+              checkOnSave = { command = "clippy" },
+              cargo = { allFeatures = true },
+              diagnostics = { disabled = { "macro-error", "inactive-code" } },
+            },
           },
         },
         jsonls = {},
