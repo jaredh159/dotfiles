@@ -75,8 +75,8 @@ if [[ -z "$slug" ]]; then
   exit 1
 fi
 
-datestamp=$(date +"%m-%d-%Y")
-target="$TASKS_DIR/${slug}--${datestamp}"
+datestamp=$(date +"%m%d%y")
+target="$TASKS_DIR/${slug}-${datestamp}"
 
 if [ -d "$target" ]; then
   echo "Target already exists: $target"
