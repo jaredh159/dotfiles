@@ -43,9 +43,15 @@ end
 local function gertrude_tasks(opts)
   opts = opts or {}
   local tasks = get_tasks_sorted_by_mtime()
+  local cwd = vim.fn.getcwd()
+
+  -- filter out current task
+  tasks = vim.tbl_filter(function(task)
+    return task.path ~= cwd
+  end, tasks)
 
   if #tasks == 0 then
-    vim.notify("No tasks found in " .. TASKS_DIR, vim.log.levels.WARN)
+    vim.notify("No other tasks found", vim.log.levels.WARN)
     return
   end
 
