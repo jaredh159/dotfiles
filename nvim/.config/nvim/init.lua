@@ -70,6 +70,7 @@ require("config.swift")
 require("plugins.lualine")
 require("plugins.lightbulb")
 require("plugins.command-palette")
+require("plugins.gertrude-tasks")
 --
 -- diagnostic quickfix custom plugin
 vim.keymap.set("n", "<leader>tt", function()
