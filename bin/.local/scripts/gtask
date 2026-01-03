@@ -21,9 +21,17 @@ clean_merged() {
     [[ -d "$dir" ]] || continue
 
     dirname=$(basename "$dir")
-    branch="${dirname%%--*}"
 
-    if [[ -z "$branch" ]]; then
+    # extract branch name from directory
+    # old format: slug--MM-DD-YYYY (double dash)
+    # new format: slug-MMDDYY (single dash + 6 digits)
+    if [[ "$dirname" == *"--"* ]]; then
+      branch="${dirname%%--*}"
+    else
+      branch="${dirname%-[0-9][0-9][0-9][0-9][0-9][0-9]}"
+    fi
+
+    if [[ -z "$branch" || "$branch" == "$dirname" ]]; then
       continue
     fi
 
@@ -54,6 +62,7 @@ clean_merged() {
 
   # now do the actual cleanup in background
   for dir in ${to_delete[@]+"${to_delete[@]}"}; do
+    dir="${dir%/}"  # strip trailing slash
     dirname=$(basename "$dir")
     tmux kill-session -t "$dirname" 2>/dev/null || true
     rm -rf "$dir" &
