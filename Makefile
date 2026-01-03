@@ -9,5 +9,6 @@ stow:
 	stow ghostty
 	stow kitty
 	stow claude
+	stow dictator
 
 .PHONY: stow
