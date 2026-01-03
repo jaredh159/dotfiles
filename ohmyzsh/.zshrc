@@ -63,7 +63,7 @@ vims() {
   if [ -f Session.vim ]; then
     nvim -S Session.vim
   else
-    nvim .
+    nvim -c "silent Obsession Session.vim" .
   fi
 }
 
