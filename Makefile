@@ -8,5 +8,6 @@ stow:
 	stow bin
 	stow ghostty
 	stow kitty
+	stow claude
 
 .PHONY: stow
