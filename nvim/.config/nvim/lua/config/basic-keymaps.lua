@@ -84,6 +84,9 @@ vim.keymap.set("n", "<leader>88", ":silent !xcode-stop<CR>", { desc = "Xcode sto
 vim.keymap.set("n", "<leader>sp", ":e ~/gertie/project-notes/_scratch.md<CR>", {
   desc = "Open scratchpad for project notes",
 })
+vim.keymap.set("n", "<leader>id", ":e ~/gertie/project-notes/ideas.md<CR>", {
+  desc = "Open ideas file",
+})
 
 -- code actions
 vim.keymap.set("n", "<leader>aa", vim.lsp.buf.code_action, { desc = "Code action" })
