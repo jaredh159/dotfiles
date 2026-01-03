@@ -93,6 +93,13 @@ vim.keymap.set("n", "<leader>ii", function()
   vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
 end, { desc = "Toggle inlay hints" })
 
+-- replace word with new short id (like ciw but inserts a fresh uuid[:8])
+vim.keymap.set("n", "cid", function()
+  local sid = vim.fn.system("/usr/local/bin/uuid"):gsub("%s+", ""):match("^[^-]+")
+  vim.cmd("normal! ciw" .. sid)
+  vim.notify("new short id: " .. sid)
+end, { desc = "Change word to new short ID" })
+
 -- quickfix enter closes window
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "qf",
