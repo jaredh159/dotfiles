@@ -95,24 +95,31 @@ fi
 mkdir -p "$target"
 
 (
-  git clone --depth 50 --single-branch git@github.com:gertrude-app/gertrude.git "$target"
-  git -C "$target" checkout -b "$slug"
+  set +e
+  log=$(mktemp)
+  failed=0
+  run() { "$@" >> "$log" 2>&1 || failed=1; }
 
-  cp ~/gertie/swift/api/.env "$target/swift/api/.env"
-  cp ~/gertie/swift/iosapp/config/Local.xcconfig "$target/swift/iosapp/config/"
-  cp ~/gertie/web/dash/app/.env.local "$target/web/dash/app/.env.local"
-  cp ~/gertie/web/site/.env.local "$target/web/site/.env.local"
+  run git clone --depth 50 --single-branch git@github.com:gertrude-app/gertrude.git "$target"
+  run git -C "$target" checkout -b "$slug"
+
+  run cp ~/gertie/swift/api/.env "$target/swift/api/.env"
+  run cp ~/gertie/swift/iosapp/config/Local.xcconfig "$target/swift/iosapp/config/"
+  run cp ~/gertie/web/dash/app/.env.local "$target/web/dash/app/.env.local"
+  run cp ~/gertie/web/site/.env.local "$target/web/site/.env.local"
 
   cd "$target/swift"
-  just migrate-up
-  pnpm install
-  git restore -- pnpm-lock.yaml
-  just check
+  run just migrate-up
+  run pnpm install
+  run git restore -- pnpm-lock.yaml
+  run just check
 
   cd "$target/web"
-  pnpm install
-  just check
-) > /dev/null 2>&1 &
+  run pnpm install
+  run just check
+
+  [[ $failed -eq 1 ]] && mv "$log" "$target/.gtask-error.log" || rm -f "$log"
+) &
 disown
 
 echo "Created: $target"
