@@ -110,3 +110,23 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.keymap.set("n", "<CR>", "<CR>:cclose<CR>", { buffer = true })
   end,
 })
+
+-- copy markdown to clipboard with line wrapping removed (for pasting into Gmail, etc.)
+vim.keymap.set("v", "<leader>mc", function()
+  -- Get visual selection boundaries (works while still in visual mode)
+  local vstart = vim.fn.getpos("v")
+  local vend = vim.fn.getpos(".")
+  local line1 = math.min(vstart[2], vend[2])
+  local line2 = math.max(vstart[2], vend[2])
+
+  local lines = vim.api.nvim_buf_get_lines(0, line1 - 1, line2, false)
+  local text = table.concat(lines, "\n")
+
+  -- Format with prettier (unwrap prose) and copy to clipboard
+  vim.fn.system("prettier --parser markdown --prose-wrap never | pbcopy", text)
+
+  -- Exit visual mode and notify
+  local esc = vim.api.nvim_replace_termcodes("<Esc>", true, false, true)
+  vim.api.nvim_feedkeys(esc, "n", false)
+  vim.notify("Markdown copied to clipboard")
+end, { desc = "Copy markdown to clipboard (unwrapped)" })
