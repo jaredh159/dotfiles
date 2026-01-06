@@ -125,6 +125,7 @@ alias j='/Users/jared/playground/lgit/target/debug/lgit "$@"'
 alias jsondiff='pdiffjson --sort-arrays'
 alias sombrero='/Users/jared/playground/sombrero/target/release/sombrero -v "$@"'
 alias bacon='CARGO_TARGET_DIR=target_bacon bacon "$@"'
+alias claudemux='/Users/jared/jaredh159/claude-usage-tmux/refresh.sh'
 
 # bun completions
 [ -s "/Users/jared/.bun/_bun" ] && source "/Users/jared/.bun/_bun"
