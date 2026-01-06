@@ -73,6 +73,6 @@ require("plugins.command-palette")
 require("plugins.gertrude-tasks")
 --
 -- diagnostic quickfix custom plugin
-vim.keymap.set("n", "<leader>tt", function()
+vim.keymap.set("n", "<leader>ee", function()
   require("plugins.diagnostic-quickfix").errors_to_quickfix()
 end, { desc = "LSP errors to quickfix" })

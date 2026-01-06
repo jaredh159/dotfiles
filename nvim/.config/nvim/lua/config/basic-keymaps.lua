@@ -80,12 +80,23 @@ vim.keymap.set("n", "<leader>gaa", ":silent! !git add .<CR><bar>:echo 'git add .
 vim.keymap.set("n", "<leader>33", ":silent !xcode-build<CR>", { desc = "Xcode build" })
 vim.keymap.set("n", "<leader>88", ":silent !xcode-stop<CR>", { desc = "Xcode stop" })
 
--- scratchpad
-vim.keymap.set("n", "<leader>sp", ":e ~/gertie/project-notes/_scratch.md<CR>", {
-  desc = "Open scratchpad for project notes",
+-- org repo
+vim.keymap.set("n", "<leader>sp", ":e ~/jaredh159/org/scratch.md<CR>", {
+  desc = "Open scratchpad",
 })
-vim.keymap.set("n", "<leader>id", ":e ~/gertie/project-notes/ideas.md<CR>", {
+vim.keymap.set("n", "<leader>id", ":e ~/jaredh159/org/ideas.md<CR>", {
   desc = "Open ideas file",
+})
+vim.keymap.set("n", "<leader>tt", ":e ~/jaredh159/org/today.md<CR>", {
+  desc = "Open today's todos",
+})
+
+-- markdown todo abbreviation
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "markdown",
+  callback = function()
+    vim.cmd([=[iabbrev <buffer> td - [ ]]=])
+  end,
 })
 
 -- code actions
