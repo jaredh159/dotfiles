@@ -91,6 +91,53 @@ vim.keymap.set("n", "<leader>tt", ":e ~/jaredh159/org/today.md<CR>", {
   desc = "Open today's todos",
 })
 
+-- scratch eject: archive selected text and delete from buffer
+vim.keymap.set("v", "<leader>se", function()
+  local vstart = vim.fn.getpos("v")
+  local vend = vim.fn.getpos(".")
+  local line1 = math.min(vstart[2], vend[2])
+  local line2 = math.max(vstart[2], vend[2])
+
+  local lines = vim.api.nvim_buf_get_lines(0, line1 - 1, line2, false)
+  local archive_path = vim.fn.expand("~/jaredh159/org/archive/ejected-scratch.md")
+  local timestamp = os.date("## %Y-%m-%d %H:%M")
+
+  -- read existing content
+  local existing = ""
+  local file = io.open(archive_path, "r")
+  if file then
+    existing = file:read("*a")
+    file:close()
+  end
+
+  -- insert after `---` separator (preserving header)
+  local new_entry = timestamp .. "\n\n" .. table.concat(lines, "\n") .. "\n\n"
+  local separator = "---\n"
+  local sep_pos = existing:find(separator, 1, true)
+  local output
+  if sep_pos then
+    local header = existing:sub(1, sep_pos + #separator - 1)
+    local rest = existing:sub(sep_pos + #separator)
+    output = header .. "\n" .. new_entry .. rest
+  else
+    -- no separator found, just prepend
+    output = new_entry .. existing
+  end
+
+  file = io.open(archive_path, "w")
+  if file then
+    file:write(output)
+    file:close()
+  end
+
+  -- delete the lines from buffer
+  vim.api.nvim_buf_set_lines(0, line1 - 1, line2, false, {})
+
+  local esc = vim.api.nvim_replace_termcodes("<Esc>", true, false, true)
+  vim.api.nvim_feedkeys(esc, "n", false)
+  vim.notify("Ejected " .. #lines .. " lines to scratch archive")
+end, { desc = "Eject selection to scratch archive" })
+
 -- markdown todo abbreviation
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "markdown",
