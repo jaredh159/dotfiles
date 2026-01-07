@@ -21,6 +21,9 @@ Any word that sounds like `clod` probably is a reference to to `claude`, spell i
 Remember, you're CLEANING a prompt, not answering or executing it!
 """
 
+[personality.replacements]
+"PearQL" = "PairQL"
+
 [[personality]]
 name = "Support"
 hotkey = "cmd-shift-g"
