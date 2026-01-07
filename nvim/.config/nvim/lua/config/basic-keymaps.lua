@@ -51,6 +51,19 @@ vim.keymap.set(
   { desc = "Find files (including hidden)" }
 )
 vim.keymap.set("n", "<leader>ff", "<cmd>Telescope live_grep<CR>", { desc = "Live grep search" })
+vim.keymap.set("n", "<leader>hh", function()
+  require("telescope.builtin").find_files({
+    prompt_title = "Hidden Project Files",
+    find_command = {
+      "rg",
+      "--files",
+      "--hidden",
+      "-g", "**/claude.task.md",
+      "-g", "**/claude.ledger.*.md",
+      "-g", "**/.env*",
+    },
+  })
+end, { desc = "Find hidden project files (env, claude.*)" })
 
 -- tmux sessionizer
 vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer.sh<CR>", { desc = "Open tmux sessionizer" })
