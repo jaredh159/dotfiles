@@ -14,6 +14,7 @@ that would best be merged and combined.
 Context for cleanup: $ARGUMENTS
 
 If context is "web" or empty and we're working on frontend code:
+
 - Extract reusable components where appropriate
 - Shorten verbose Tailwind class combinations (use @apply or component abstractions)
 - Remove unused utilities, imports, and dead code
@@ -21,6 +22,7 @@ If context is "web" or empty and we're working on frontend code:
 - Ensure consistent naming conventions
 
 If context is "swift" or we're working on Swift code:
+
 - Follow existing codebase patterns strictly
 - Leverage existing helper functions and services
 - Check for proper error handling
@@ -30,3 +32,5 @@ If context is "swift" or we're working on Swift code:
 Give it a thorough clean-up pass, but it's important that in all the cleaning up you do,
 you don't change any of the appearance if it's a visual change set, or any of the core
 observed functionality while you do so.
+
+When you've finished, summarize any changes you made in 10 lines or less.
