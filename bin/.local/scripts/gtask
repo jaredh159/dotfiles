@@ -60,11 +60,27 @@ clean_merged() {
     echo "${green}keeping:  ${dirname}${reset}"
   done
 
+  # kill processes on common dev ports
+  for port in 8080 8081 3000 4243 6006; do
+    pids=$(lsof -ti:"$port" 2>/dev/null) || true
+    [[ -n "$pids" ]] && kill -9 $pids 2>/dev/null || true
+  done
+
   # now do the actual cleanup in background
   for dir in ${to_delete[@]+"${to_delete[@]}"}; do
     dir="${dir%/}"  # strip trailing slash
     dirname=$(basename "$dir")
+
+    # kill tmux session by name
     tmux kill-session -t "$dirname" 2>/dev/null || true
+
+    # kill any tmux panes whose cwd is inside this directory
+    tmux list-panes -a -F '#{pane_id} #{pane_current_path}' 2>/dev/null | while read -r pane_id pane_path; do
+      if [[ "$pane_path" == "$dir"* ]]; then
+        tmux kill-pane -t "$pane_id" 2>/dev/null || true
+      fi
+    done
+
     rm -rf "$dir" &
     disown
   done
