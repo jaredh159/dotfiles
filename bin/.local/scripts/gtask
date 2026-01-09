@@ -128,11 +128,22 @@ mkdir -p "$target"
   run just migrate-up
   run pnpm install
   run git restore -- pnpm-lock.yaml
-  run just check
+  # granular swift checks (so failures don't skip cache warming)
+  run just nuke-test-db
+  run just build
+  run just macapp-xcode-build
+  run just iosapp-xcode-build
+  run just test
+  run just lint
 
   cd "$target/web"
   run pnpm install
-  run just check
+  # granular web checks (so failures don't skip cache warming)
+  run just lint
+  run just format-check
+  run just typecheck
+  run just test
+  run just build-storybook
 
   [[ $failed -eq 1 ]] && mv "$log" "$target/.gtask-error.log" || rm -f "$log"
 ) &
