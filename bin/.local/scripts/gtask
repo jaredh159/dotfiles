@@ -66,7 +66,7 @@ clean_merged() {
     [[ -n "$pids" ]] && kill -9 $pids 2>/dev/null || true
   done
 
-  # now do the actual cleanup in background
+  # kill tmux sessions and panes first
   for dir in ${to_delete[@]+"${to_delete[@]}"}; do
     dir="${dir%/}"  # strip trailing slash
     dirname=$(basename "$dir")
@@ -80,9 +80,14 @@ clean_merged() {
         tmux kill-pane -t "$pane_id" 2>/dev/null || true
       fi
     done
+  done
 
-    rm -rf "$dir" &
-    disown
+  # two-pass deletion to handle stubborn directories
+  for pass in 1 2; do
+    for dir in ${to_delete[@]+"${to_delete[@]}"}; do
+      dir="${dir%/}"
+      [[ -d "$dir" ]] && rm -rf "$dir" 2>/dev/null || true
+    done
   done
 }
 
