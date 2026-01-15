@@ -24,6 +24,10 @@ export ANDROID_HOME=$HOME/Library/Android/sdk
 # swift/gertrude
 export TASK_MEGA_YIELD_COUNT=100
 
+# temp claude issues
+# export CLAUDE_CODE_DISABLE_AUTO_UPDATE=1
+# export DISABLE_AUTOUPDATER=1
+
 # clear out the path, start brand new
 PATH=""
 
@@ -55,6 +59,8 @@ path+=/Applications/kitty.app/Contents/MacOS
 path+=$ANDROID_HOME/emulator
 path+=$ANDROID_HOME/platform-tools
 path+=~/.lmstudio/bin
+path+=~/.opencode/bin
+path+=~/.cargo/bin
 
 export PATH
 
