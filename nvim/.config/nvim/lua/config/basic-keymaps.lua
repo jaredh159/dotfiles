@@ -168,9 +168,11 @@ vim.keymap.set("n", "<leader>ii", function()
 end, { desc = "Toggle inlay hints" })
 
 -- replace word with new short id (like ciw but inserts a fresh uuid[:8])
+-- uses feedkeys so dot repeat inserts the same ID (vim remembers the literal text, not the function)
 vim.keymap.set("n", "cid", function()
   local sid = vim.fn.system("/usr/local/bin/uuid"):gsub("%s+", ""):match("^[^-]+")
-  vim.cmd("normal! ciw" .. sid)
+  local esc = vim.api.nvim_replace_termcodes("<Esc>", true, true, true)
+  vim.api.nvim_feedkeys("ciw" .. sid .. esc, "n", false)
   vim.notify("new short id: " .. sid)
 end, { desc = "Change word to new short ID" })
 
