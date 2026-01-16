@@ -71,3 +71,10 @@ vim.o.inccommand = "split"
 -- instead raise a dialog asking if you wish to save the current file(s)
 -- See `:help 'confirm'`
 vim.o.confirm = true
+
+-- Auto-reload files changed by external processes (like Claude Code)
+vim.o.autoread = true
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
+  group = vim.api.nvim_create_augroup("auto-reload", { clear = true }),
+  command = "checktime",
+})
