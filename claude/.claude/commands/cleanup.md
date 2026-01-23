@@ -15,6 +15,7 @@ Context for cleanup: $ARGUMENTS
 
 If context is "web" or empty and we're working on frontend code:
 
+- Prefer re-using existing components, search for missed opportunities
 - Extract reusable components where appropriate
 - Shorten verbose Tailwind class combinations (use @apply or component abstractions)
 - Remove unused utilities, imports, and dead code
