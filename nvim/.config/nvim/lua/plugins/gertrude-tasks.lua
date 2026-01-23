@@ -7,6 +7,11 @@ local action_state = require("telescope.actions.state")
 
 local TASKS_DIR = vim.fn.expand("$HOME/gertie/tasks")
 
+-- TODO: remove when supervision tool work calms down
+local ALWAYS_INCLUDE = {
+  vim.fn.expand("$HOME/gertie/supervise"),
+}
+
 local function get_tasks_sorted_by_mtime()
   local tasks = {}
   local handle = vim.loop.fs_scandir(TASKS_DIR)
@@ -25,6 +30,24 @@ local function get_tasks_sorted_by_mtime()
       if stat then
         table.insert(tasks, {
           name = name,
+          path = path,
+          mtime = stat.mtime.sec,
+        })
+      end
+    end
+  end
+
+  -- add always-included paths
+  local seen = {}
+  for _, task in ipairs(tasks) do
+    seen[task.path] = true
+  end
+  for _, path in ipairs(ALWAYS_INCLUDE) do
+    if not seen[path] then
+      local stat = vim.loop.fs_stat(path)
+      if stat then
+        table.insert(tasks, {
+          name = vim.fn.fnamemodify(path, ":t"),
           path = path,
           mtime = stat.mtime.sec,
         })
