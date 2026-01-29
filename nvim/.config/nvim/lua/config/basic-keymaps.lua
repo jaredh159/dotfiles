@@ -61,6 +61,7 @@ vim.keymap.set("n", "<leader>hh", function()
       "-g", "**/claude.task.md",
       "-g", "**/claude.ledger.*.md",
       "-g", "**/.env*",
+      "-g", "**/Local.xcconfig",
     },
   })
 end, { desc = "Find hidden project files (env, claude.*)" })
