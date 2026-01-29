@@ -78,3 +78,36 @@ vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHo
   group = vim.api.nvim_create_augroup("auto-reload", { clear = true }),
   command = "checktime",
 })
+
+-- Auto-close old buffers to keep the buffer list manageable
+local max_buffers = 10
+vim.api.nvim_create_autocmd("BufEnter", {
+  group = vim.api.nvim_create_augroup("auto-close-old-buffers", { clear = true }),
+  callback = function()
+    local bufs = vim.fn.getbufinfo({ buflisted = 1 })
+    if #bufs <= max_buffers then return end
+
+    local visible = {}
+    for _, win in ipairs(vim.api.nvim_list_wins()) do
+      visible[vim.api.nvim_win_get_buf(win)] = true
+    end
+
+    local candidates = {}
+    for _, buf in ipairs(bufs) do
+      if not visible[buf.bufnr]
+        and not vim.bo[buf.bufnr].modified
+        and vim.bo[buf.bufnr].buftype == "" then
+        table.insert(candidates, buf)
+      end
+    end
+
+    table.sort(candidates, function(a, b)
+      return (a.lastused or 0) < (b.lastused or 0)
+    end)
+
+    local to_close = #bufs - max_buffers
+    for i = 1, math.min(to_close, #candidates) do
+      vim.api.nvim_buf_delete(candidates[i].bufnr, {})
+    end
+  end,
+})
