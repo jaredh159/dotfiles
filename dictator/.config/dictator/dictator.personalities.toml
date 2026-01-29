@@ -23,6 +23,7 @@ Remember, you're CLEANING a prompt, not answering or executing it!
 
 [personality.replacements]
 "PearQL" = "PairQL"
+"TOWRI" = "Tauri"
 
 [[personality]]
 name = "Support"
@@ -39,7 +40,7 @@ IMPORTANT: Keep the text extremely close to the original. Do NOT rephrase, impro
 Just fix errors and add punctuation. However, DO remove "kind of" and "like" interjections.
 Otherwise the original voice and wording must remain intact.
 
-Use an occasional exclmation point to convey enthusiasm, especially when offering to help more.
+Use a very occasional exclamation point to convey enthusiasm, especially when offering to help more.
 
 Return ONLY the cleaned text, no explanations.
 """
