@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+# Remove current session from MRU stack and cycle to next
+
+MRU_FILE="$HOME/.tmux-mru"
+
+if [[ ! -f "$MRU_FILE" ]]; then
+  tmux display-message "No MRU history"
+  exit 0
+fi
+
+current_session=$(tmux display-message -p '#S')
+
+# Read MRU into array, filter to existing sessions
+sessions=()
+while IFS= read -r session; do
+  if tmux has-session -t "$session" 2>/dev/null; then
+    sessions+=("$session")
+  fi
+done < "$MRU_FILE"
+
+# Find current position
+current_idx=-1
+for i in "${!sessions[@]}"; do
+  if [[ "${sessions[$i]}" == "$current_session" ]]; then
+    current_idx=$i
+    break
+  fi
+done
+
+# Remove current session from the file
+grep -v "^${current_session}$" "$MRU_FILE" > "$MRU_FILE.tmp"
+mv "$MRU_FILE.tmp" "$MRU_FILE"
+
+# If we found the session and there are others, cycle to next
+if [[ $current_idx -ne -1 && ${#sessions[@]} -gt 1 ]]; then
+  # Calculate next index (in the original array, before removal)
+  next_idx=$(( (current_idx + 1) % ${#sessions[@]} ))
+  if [[ $next_idx -eq $current_idx ]]; then
+    next_idx=$(( (current_idx + 2) % ${#sessions[@]} ))
+  fi
+  target_session="${sessions[$next_idx]}"
+
+  # Skip MRU tracking for this switch
+  tmux set-environment -g TMUX_MRU_SKIP "$target_session"
+  tmux switch-client -t "$target_session"
+  tmux display-message "Ejected '$current_session' from MRU"
+else
+  tmux display-message "Ejected '$current_session' from MRU (staying here)"
+fi

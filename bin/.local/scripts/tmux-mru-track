@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# Called by tmux hook on client-session-changed
+# Updates the MRU session list, unless we're in a cycle operation
+
+MRU_FILE="$HOME/.tmux-mru"
+MAX_SESSIONS=5
+
+current_session=$(tmux display-message -p '#S')
+
+# Check if we should skip this update (cycling in progress)
+skip_session=$(tmux show-environment -g TMUX_MRU_SKIP 2>/dev/null | cut -d= -f2)
+if [[ "$skip_session" == "$current_session" ]]; then
+  tmux set-environment -gu TMUX_MRU_SKIP
+  exit 0
+fi
+
+# Create file if it doesn't exist
+touch "$MRU_FILE"
+
+# Read existing entries, filter out current session, prepend it
+{
+  echo "$current_session"
+  grep -v "^${current_session}$" "$MRU_FILE" | head -n $((MAX_SESSIONS - 1))
+} > "$MRU_FILE.tmp"
+
+mv "$MRU_FILE.tmp" "$MRU_FILE"

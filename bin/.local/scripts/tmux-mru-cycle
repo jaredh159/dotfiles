@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+# Cycle through MRU sessions without updating the MRU list
+
+MRU_FILE="$HOME/.tmux-mru"
+
+if [[ ! -f "$MRU_FILE" ]]; then
+  tmux display-message "No MRU history yet"
+  exit 0
+fi
+
+current_session=$(tmux display-message -p '#S')
+
+# Read MRU into array, filter to only existing sessions
+sessions=()
+while IFS= read -r session; do
+  if tmux has-session -t "$session" 2>/dev/null; then
+    sessions+=("$session")
+  fi
+done < "$MRU_FILE"
+
+if [[ ${#sessions[@]} -lt 2 ]]; then
+  tmux display-message "Not enough sessions to cycle"
+  exit 0
+fi
+
+# Find current position
+current_idx=-1
+for i in "${!sessions[@]}"; do
+  if [[ "${sessions[$i]}" == "$current_session" ]]; then
+    current_idx=$i
+    break
+  fi
+done
+
+# Calculate next index (wrap around)
+if [[ $current_idx -eq -1 ]]; then
+  next_idx=0
+else
+  next_idx=$(( (current_idx + 1) % ${#sessions[@]} ))
+fi
+
+target_session="${sessions[$next_idx]}"
+
+# Set skip flag so the hook doesn't update MRU
+tmux set-environment -g TMUX_MRU_SKIP "$target_session"
+
+# Switch to target session
+tmux switch-client -t "$target_session"
