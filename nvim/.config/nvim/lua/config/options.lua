@@ -84,6 +84,9 @@ local max_buffers = 10
 vim.api.nvim_create_autocmd("BufEnter", {
   group = vim.api.nvim_create_augroup("auto-close-old-buffers", { clear = true }),
   callback = function()
+    -- Skip during session restore (vim-obsession sets SessionLoad)
+    if vim.g.SessionLoad then return end
+
     local bufs = vim.fn.getbufinfo({ buflisted = 1 })
     if #bufs <= max_buffers then return end
 
