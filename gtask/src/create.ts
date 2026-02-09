@@ -1,14 +1,37 @@
-import { existsSync, mkdirSync, copyFileSync, mkdtempSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { makeTargetDir } from "./parse.ts";
 import { background } from "./exec.ts";
+import { loadTemplate, resolveTemplate, buildTemplateVars } from "./template.ts";
 import {
   TASKS_DIR,
   REPO_SSH,
-  ENV_SOURCE_DIR,
-  ENV_FILES,
+  TEMPLATE_DIR,
+  ENV_TEMPLATES,
+  DEFAULT_API_PORT,
+  DEFAULT_DASHBOARD_PORT,
+  DEFAULT_DATABASE_NAME,
+  DEFAULT_TEST_DATABASE_NAME,
 } from "./constants.ts";
+
+function writeEnvFiles(target: string): void {
+  const vars = buildTemplateVars({
+    TASK_DATABASE_NAME: DEFAULT_DATABASE_NAME,
+    TASK_TEST_DATABASE_NAME: DEFAULT_TEST_DATABASE_NAME,
+    TASK_API_PORT: String(DEFAULT_API_PORT),
+    TASK_DASHBOARD_PORT: String(DEFAULT_DASHBOARD_PORT),
+  });
+
+  for (const { template, dest } of ENV_TEMPLATES) {
+    const templatePath = join(TEMPLATE_DIR, template);
+    const destPath = join(target, dest);
+    const content = loadTemplate(templatePath);
+    const resolved = resolveTemplate(content, vars);
+    mkdirSync(dirname(destPath), { recursive: true });
+    writeFileSync(destPath, resolved);
+  }
+}
 
 export async function create(slug: string): Promise<void> {
   const dirName = makeTargetDir(slug);
@@ -24,6 +47,14 @@ export async function create(slug: string): Promise<void> {
   const logFile = join(tmpdir(), `gtask-${dirName}.log`);
   const errorLog = join(target, ".gtask-error.log");
 
+  const envStaging = join(target, ".gtask-env-staging");
+  mkdirSync(envStaging);
+  writeEnvFiles(envStaging);
+
+  const envCopyCmds = ENV_TEMPLATES.map(({ dest }) =>
+    `run cp "${join(envStaging, dest)}" "${join(target, dest)}"`
+  );
+
   const cmds = [
     `set -e`,
     `log="${logFile}"`,
@@ -33,10 +64,8 @@ export async function create(slug: string): Promise<void> {
     `run git clone --depth 50 --single-branch ${REPO_SSH} "${target}"`,
     `run git -C "${target}" checkout -b "${slug}"`,
     ``,
-    ...ENV_FILES.map(
-      (f) =>
-        `run cp "${join(ENV_SOURCE_DIR, f.src)}" "${join(target, f.dest)}"`
-    ),
+    ...envCopyCmds,
+    `rm -rf "${envStaging}"`,
     ``,
     `cd "${join(target, "swift")}"`,
     `run just migrate-up`,
