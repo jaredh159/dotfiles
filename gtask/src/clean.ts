@@ -1,7 +1,8 @@
-import { readdirSync, existsSync, rmSync } from "node:fs";
+import { readdirSync, existsSync } from "node:fs";
 import { join, basename } from "node:path";
 import { parseBranchFromDir } from "./parse.ts";
-import { exec, execSafe } from "./exec.ts";
+import { execSafe } from "./exec.ts";
+import { background } from "./exec.ts";
 import { red, green } from "./color.ts";
 import { TASKS_DIR, REPO, DEV_PORTS } from "./constants.ts";
 
@@ -10,33 +11,6 @@ function getMergedPrCount(branch: string): number {
     `gh pr list --repo ${REPO} --head "${branch}" --state merged --json number --jq 'length'`
   );
   return parseInt(result, 10) || 0;
-}
-
-function killDevPorts(): void {
-  for (const port of DEV_PORTS) {
-    const pids = execSafe(`lsof -ti:${port}`);
-    if (pids) {
-      for (const pid of pids.split("\n").filter(Boolean)) {
-        execSafe(`kill -9 ${pid}`);
-      }
-    }
-  }
-}
-
-function killTmuxForDir(dir: string): void {
-  const dirname = basename(dir);
-  execSafe(`tmux kill-session -t "${dirname}"`);
-
-  const panes = execSafe(`tmux list-panes -a -F '#{pane_id} #{pane_current_path}'`);
-  for (const line of panes.split("\n").filter(Boolean)) {
-    const spaceIdx = line.indexOf(" ");
-    if (spaceIdx === -1) continue;
-    const paneId = line.slice(0, spaceIdx);
-    const panePath = line.slice(spaceIdx + 1);
-    if (panePath.startsWith(dir)) {
-      execSafe(`tmux kill-pane -t "${paneId}"`);
-    }
-  }
 }
 
 export async function clean(): Promise<void> {
@@ -72,19 +46,31 @@ export async function clean(): Promise<void> {
     console.log(green(`keeping:  ${dirname}`));
   }
 
-  killDevPorts();
+  if (toDelete.length === 0) return;
 
-  for (const dir of toDelete) {
-    killTmuxForDir(dir);
-  }
+  const portKills = DEV_PORTS.map(
+    (port) => `pids=$(lsof -ti:${port} 2>/dev/null) && kill -9 $pids 2>/dev/null || true`
+  );
 
-  for (const _pass of [1, 2]) {
-    for (const dir of toDelete) {
-      if (existsSync(dir)) {
-        try {
-          rmSync(dir, { recursive: true, force: true });
-        } catch {}
-      }
-    }
-  }
+  const tmuxKills = toDelete.flatMap((dir) => {
+    const dirname = basename(dir);
+    return [
+      `tmux kill-session -t "${dirname}" 2>/dev/null || true`,
+      `tmux list-panes -a -F '#{pane_id} #{pane_current_path}' 2>/dev/null | while read -r pane_id pane_path; do`,
+      `  case "$pane_path" in "${dir}"*) tmux kill-pane -t "$pane_id" 2>/dev/null || true ;; esac`,
+      `done`,
+    ];
+  });
+
+  const deletions = toDelete.map((dir) => `rm -rf "${dir}" 2>/dev/null || true`);
+
+  const cmds = [
+    ...portKills,
+    ...tmuxKills,
+    ...deletions,
+    `sleep 1`,
+    ...deletions,
+  ];
+
+  background(cmds, { cwd: TASKS_DIR, logFile: "/dev/null" });
 }
