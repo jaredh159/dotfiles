@@ -1,6 +1,6 @@
 import { readdirSync, existsSync } from "node:fs";
 import { join, basename } from "node:path";
-import { parseBranchFromDir } from "./parse.ts";
+import { parseBranchFromDir, dbNameFromDir } from "./parse.ts";
 import { execSafe } from "./exec.ts";
 import { background } from "./exec.ts";
 import { red, green } from "./color.ts";
@@ -62,11 +62,20 @@ export async function clean(): Promise<void> {
     ];
   });
 
+  const dbDrops = toDelete.flatMap((dir) => {
+    const dbName = dbNameFromDir(basename(dir));
+    return [
+      `dropdb --if-exists ${dbName}`,
+      `dropdb --if-exists ${dbName}_test`,
+    ];
+  });
+
   const deletions = toDelete.map((dir) => `rm -rf "${dir}" 2>/dev/null || true`);
 
   const cmds = [
     ...portKills,
     ...tmuxKills,
+    ...dbDrops,
     ...deletions,
     `sleep 1`,
     ...deletions,

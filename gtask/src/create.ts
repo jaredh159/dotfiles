@@ -1,8 +1,8 @@
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
-import { makeTargetDir } from "./parse.ts";
-import { background } from "./exec.ts";
+import { makeTargetDir, dbNameFromDir } from "./parse.ts";
+import { exec, background } from "./exec.ts";
 import { loadTemplate, resolveTemplate, buildTemplateVars } from "./template.ts";
 import {
   TASKS_DIR,
@@ -11,14 +11,13 @@ import {
   ENV_TEMPLATES,
   DEFAULT_API_PORT,
   DEFAULT_DASHBOARD_PORT,
-  DEFAULT_DATABASE_NAME,
-  DEFAULT_TEST_DATABASE_NAME,
+  TEMPLATE_DATABASE,
 } from "./constants.ts";
 
-function writeEnvFiles(target: string): void {
+function writeEnvFiles(target: string, dbName: string, testDbName: string): void {
   const vars = buildTemplateVars({
-    TASK_DATABASE_NAME: DEFAULT_DATABASE_NAME,
-    TASK_TEST_DATABASE_NAME: DEFAULT_TEST_DATABASE_NAME,
+    TASK_DATABASE_NAME: dbName,
+    TASK_TEST_DATABASE_NAME: testDbName,
     TASK_API_PORT: String(DEFAULT_API_PORT),
     TASK_DASHBOARD_PORT: String(DEFAULT_DASHBOARD_PORT),
   });
@@ -44,12 +43,17 @@ export async function create(slug: string): Promise<void> {
 
   mkdirSync(target, { recursive: true });
 
+  const dbName = dbNameFromDir(dirName);
+  const testDbName = `${dbName}_test`;
+  exec(`createdb -T ${TEMPLATE_DATABASE} ${dbName}`);
+  exec(`createdb ${testDbName}`);
+
   const logFile = join(tmpdir(), `gtask-${dirName}.log`);
   const errorLog = join(target, ".gtask-error.log");
 
   const envStaging = join(target, ".gtask-env-staging");
   mkdirSync(envStaging);
-  writeEnvFiles(envStaging);
+  writeEnvFiles(envStaging, dbName, testDbName);
 
   const envCopyCmds = ENV_TEMPLATES.map(({ dest }) =>
     `run cp "${join(envStaging, dest)}" "${join(target, dest)}"`

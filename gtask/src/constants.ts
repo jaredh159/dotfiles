@@ -18,5 +18,4 @@ export const DEV_PORTS = [8080, 8081, 3000, 4243, 6006];
 
 export const DEFAULT_API_PORT = 8080;
 export const DEFAULT_DASHBOARD_PORT = 8081;
-export const DEFAULT_DATABASE_NAME = "gertrude_sync";
-export const DEFAULT_TEST_DATABASE_NAME = "gertrude_test";
+export const TEMPLATE_DATABASE = "gertrude_sync";

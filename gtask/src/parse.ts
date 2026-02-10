@@ -23,3 +23,7 @@ export function makeDatestamp(): string {
 export function makeTargetDir(slug: string): string {
   return `${slug}-${makeDatestamp()}`;
 }
+
+export function dbNameFromDir(dirname: string): string {
+  return `g_${dirname.replace(/-/g, "_")}`;
+}
