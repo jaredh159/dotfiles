@@ -4,27 +4,29 @@ import { tmpdir } from "node:os";
 import { makeTargetDir, dbNameFromDir } from "./parse.ts";
 import { exec, background } from "./exec.ts";
 import { loadTemplate, resolveTemplate, buildTemplateVars } from "./template.ts";
+import { allocateSlot, portsForSlot, portsFileContent } from "./slot.ts";
 import {
   TASKS_DIR,
   REPO_SSH,
   TEMPLATE_DIR,
   ENV_TEMPLATES,
-  DEFAULT_API_PORT,
-  DEFAULT_DASHBOARD_PORT,
   TEMPLATE_DATABASE,
+  SLOT_FILE,
+  PORTS_FILE,
 } from "./constants.ts";
+import type { TaskPorts } from "./slot.ts";
 
-function writeEnvFiles(target: string, dbName: string, testDbName: string): void {
+function writeEnvFiles(stagingDir: string, dbName: string, testDbName: string, ports: TaskPorts): void {
   const vars = buildTemplateVars({
     TASK_DATABASE_NAME: dbName,
     TASK_TEST_DATABASE_NAME: testDbName,
-    TASK_API_PORT: String(DEFAULT_API_PORT),
-    TASK_DASHBOARD_PORT: String(DEFAULT_DASHBOARD_PORT),
+    TASK_API_PORT: String(ports.api),
+    TASK_DASHBOARD_PORT: String(ports.dash),
   });
 
   for (const { template, dest } of ENV_TEMPLATES) {
     const templatePath = join(TEMPLATE_DIR, template);
-    const destPath = join(target, dest);
+    const destPath = join(stagingDir, dest);
     const content = loadTemplate(templatePath);
     const resolved = resolveTemplate(content, vars);
     mkdirSync(dirname(destPath), { recursive: true });
@@ -41,7 +43,8 @@ export async function create(slug: string): Promise<void> {
     process.exit(1);
   }
 
-  mkdirSync(target, { recursive: true });
+  const slot = allocateSlot();
+  const ports = portsForSlot(slot);
 
   const dbName = dbNameFromDir(dirName);
   const testDbName = `${dbName}_test`;
@@ -51,12 +54,14 @@ export async function create(slug: string): Promise<void> {
   const logFile = join(tmpdir(), `gtask-${dirName}.log`);
   const errorLog = join(target, ".gtask-error.log");
 
-  const envStaging = join(target, ".gtask-env-staging");
-  mkdirSync(envStaging);
-  writeEnvFiles(envStaging, dbName, testDbName);
+  const staging = join(tmpdir(), `gtask-staging-${dirName}`);
+  mkdirSync(staging, { recursive: true });
+  writeEnvFiles(staging, dbName, testDbName, ports);
+  writeFileSync(join(staging, SLOT_FILE), String(slot) + "\n");
+  writeFileSync(join(staging, PORTS_FILE), portsFileContent(ports));
 
   const envCopyCmds = ENV_TEMPLATES.map(({ dest }) =>
-    `run cp "${join(envStaging, dest)}" "${join(target, dest)}"`
+    `run cp "${join(staging, dest)}" "${join(target, dest)}"`
   );
 
   const cmds = [
@@ -69,9 +74,12 @@ export async function create(slug: string): Promise<void> {
     `run git -C "${target}" checkout -b "${slug}"`,
     ``,
     ...envCopyCmds,
-    `rm -rf "${envStaging}"`,
+    `cp "${join(staging, SLOT_FILE)}" "${join(target, SLOT_FILE)}"`,
+    `cp "${join(staging, PORTS_FILE)}" "${join(target, PORTS_FILE)}"`,
+    `rm -rf "${staging}"`,
     ``,
     `cd "${join(target, "swift")}"`,
+    `export API_PORT=${ports.api}`,
     `run just migrate-up`,
     `run pnpm install`,
     `run git restore -- pnpm-lock.yaml`,
@@ -93,7 +101,8 @@ export async function create(slug: string): Promise<void> {
     `[ $failed -eq 1 ] && mv "$log" "${errorLog}" || rm -f "$log"`,
   ];
 
-  background(cmds, { cwd: target, logFile });
+  background(cmds, { cwd: TASKS_DIR, logFile });
 
   console.log(`Created: ${target}`);
+  console.log(`  slot ${slot}: api=${ports.api} dash=${ports.dash} site=${ports.site} admin=${ports.admin} storybook=${ports.storybook}`);
 }

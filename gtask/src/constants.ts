@@ -14,8 +14,14 @@ export const ENV_TEMPLATES = [
   { template: "site.env.local.template", dest: "web/site/.env.local" },
 ];
 
-export const DEV_PORTS = [8080, 8081, 3000, 4243, 6006];
-
-export const DEFAULT_API_PORT = 8080;
-export const DEFAULT_DASHBOARD_PORT = 8081;
+export const SLOT_FILE = ".gtask-slot";
+export const PORTS_FILE = ".gtask-ports";
 export const TEMPLATE_DATABASE = "gertrude_sync";
+
+export const BASE_PORTS = {
+  api: 8080,
+  dash: 8081,
+  site: 3000,
+  admin: 4243,
+  storybook: 6006,
+};

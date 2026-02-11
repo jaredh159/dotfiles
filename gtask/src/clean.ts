@@ -4,7 +4,8 @@ import { parseBranchFromDir, dbNameFromDir } from "./parse.ts";
 import { execSafe } from "./exec.ts";
 import { background } from "./exec.ts";
 import { red, green } from "./color.ts";
-import { TASKS_DIR, REPO, DEV_PORTS } from "./constants.ts";
+import { readSlot, portsForSlot } from "./slot.ts";
+import { TASKS_DIR, REPO } from "./constants.ts";
 
 function getMergedPrCount(branch: string): number {
   const result = execSafe(
@@ -48,9 +49,14 @@ export async function clean(): Promise<void> {
 
   if (toDelete.length === 0) return;
 
-  const portKills = DEV_PORTS.map(
-    (port) => `pids=$(lsof -ti:${port} 2>/dev/null) && kill -9 $pids 2>/dev/null || true`
-  );
+  const portKills = toDelete.flatMap((dir) => {
+    const slot = readSlot(dir);
+    if (slot === null) return [];
+    const ports = portsForSlot(slot);
+    return Object.values(ports).map(
+      (port) => `pids=$(lsof -ti:${port} 2>/dev/null) && kill -9 $pids 2>/dev/null || true`
+    );
+  });
 
   const tmuxKills = toDelete.flatMap((dir) => {
     const dirname = basename(dir);
