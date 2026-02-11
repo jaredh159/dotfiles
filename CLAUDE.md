@@ -27,7 +27,8 @@ The Makefile runs `stow <package>` for each directory, creating symlinks.
 | `nvim/`      | Neovim config (Lua)                     | `~/.config/nvim/`           |
 | `tmux/`      | Tmux configuration                      | `~/.tmux.conf`              |
 | `ohmyzsh/`   | Zsh config, oh-my-zsh, p10k             | `~/.zshrc`, `~/.oh-my-zsh/` |
-| `bin/`       | Shell scripts (gtask, tmux-sessionizer) | `~/.local/scripts/`         |
+| `bin/`       | Shell scripts (gtask shim, tmux-sessionizer) | `~/.local/scripts/`    |
+| `gtask/`     | Task workflow CLI (TypeScript)           | not stowed, run via shim    |
 | `karabiner/` | Keyboard remapping (macOS)              | `~/.config/karabiner/`      |
 | `kitty/`     | Kitty terminal config                   | `~/.config/kitty/`          |
 | `ghostty/`   | Ghostty terminal config                 | `~/.config/ghostty/`        |
@@ -41,6 +42,11 @@ The Makefile runs `stow <package>` for each directory, creating symlinks.
 - `nvim/.config/nvim/init.lua` - Neovim entry point
 - `ohmyzsh/.zshrc` - Shell configuration
 - `bin/.local/scripts/` - Custom shell utilities
+
+## gtask
+
+If working on anything related to the `gtask` CLI tool (task creation, cleanup, port/db
+isolation, env templates), read `gtask/GTASK.md` for full documentation.
 
 ## Adding New Configs
 

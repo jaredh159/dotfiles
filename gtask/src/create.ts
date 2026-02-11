@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { makeTargetDir, dbNameFromDir } from "./parse.ts";
-import { exec, background } from "./exec.ts";
+import { background } from "./exec.ts";
 import { loadTemplate, resolveTemplate, buildTemplateVars } from "./template.ts";
 import { allocateSlot, portsForSlot, portsFileContent } from "./slot.ts";
 import {
@@ -48,8 +48,6 @@ export async function create(slug: string): Promise<void> {
 
   const dbName = dbNameFromDir(dirName);
   const testDbName = `${dbName}_test`;
-  exec(`createdb -T ${TEMPLATE_DATABASE} ${dbName}`);
-  exec(`createdb ${testDbName}`);
 
   const logFile = join(tmpdir(), `gtask-${dirName}.log`);
   const errorLog = join(target, ".gtask-error.log");
@@ -70,6 +68,8 @@ export async function create(slug: string): Promise<void> {
     `failed=0`,
     `run() { "$@" >> "$log" 2>&1 || failed=1; }`,
     ``,
+    `run createdb -T ${TEMPLATE_DATABASE} ${dbName}`,
+    `run createdb ${testDbName}`,
     `run git clone --depth 50 --single-branch ${REPO_SSH} "${target}"`,
     `run git -C "${target}" checkout -b "${slug}"`,
     ``,
@@ -104,5 +104,4 @@ export async function create(slug: string): Promise<void> {
   background(cmds, { cwd: TASKS_DIR, logFile });
 
   console.log(`Created: ${target}`);
-  console.log(`  slot ${slot}: api=${ports.api} dash=${ports.dash} site=${ports.site} admin=${ports.admin} storybook=${ports.storybook}`);
 }
