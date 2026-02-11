@@ -12,6 +12,7 @@ export const ENV_TEMPLATES = [
   { template: "iosapp.xcconfig.template", dest: "swift/iosapp/config/Local.xcconfig" },
   { template: "dash.env.local.template", dest: "web/dash/app/.env.local" },
   { template: "site.env.local.template", dest: "web/site/.env.local" },
+  { template: "admin.env.local.template", dest: "web/admin/.env.local" },
 ];
 
 export const SLOT_FILE = ".gtask-slot";
