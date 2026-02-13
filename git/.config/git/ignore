@@ -4,3 +4,4 @@ Session.vim
 **/.claude/settings.local.json
 claude.task.md
 claude.ledger.*.md
+claude.report.*.md
