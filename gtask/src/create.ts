@@ -96,6 +96,7 @@ export async function create(slug: string): Promise<void> {
     `run just format-check`,
     `run just typecheck`,
     `run just test`,
+    `run just build-storybook`,
     `# warm storybook dev cache (start dev server, wait for ready, kill)`,
     `just storybook >> "$log" 2>&1 &`,
     `sb_pid=$!`,
