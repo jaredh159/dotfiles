@@ -6,6 +6,9 @@ Read the main `./CLAUDE.md` file, and then check for a `./claude.task.md` file, 
 context catchup (ledger) files (pattern: `./claude.ledger.*.md`) referenced in the task
 file, reading all of them, if they exist, in order.
 
+**Important:** These files are gitignored. Use `ls claude.ledger.*.md` via Bash to find
+them — Grep and Glob use ripgrep which silently skips gitignored files.
+
 Summarize your understanding of the task and context in < 20 lines. If something seems
 very unclear that would stop you from proceeding, point it out.
 

@@ -11,7 +11,8 @@ nuanced.
 
 ### 1. Determine ledger number
 
-- List existing `claude.ledger.*.md` files in the project root
+- List existing `claude.ledger.*.md` files in the project root using `ls claude.ledger.*.md`
+  via Bash (these files are gitignored, so Grep/Glob will silently skip them)
 - New file = `claude.ledger.{max + 1}.md` (or `1` if none exist)
 
 ### 2. Create the ledger file with this structure:
