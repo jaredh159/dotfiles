@@ -192,6 +192,7 @@ return {
         },
         jsonls = {},
         zls = {}, -- zig
+        clangd = {},
         ts_ls = {}, -- typescript, but consider: https://github.com/pmizio/typescript-tools.nvim
         lua_ls = {
           settings = { Lua = { completion = { callSnippet = "Replace" } } },
@@ -214,6 +215,7 @@ return {
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         "stylua",
+        "clang-format",
         "jsonls",
         "zls",
         "gopls",

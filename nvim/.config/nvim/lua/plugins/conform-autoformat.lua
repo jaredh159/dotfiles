@@ -18,7 +18,7 @@ return { -- Autoformat
       -- Disable "format_on_save lsp_fallback" for languages that don't
       -- have a well standardized coding style. You can add additional
       -- languages here or re-enable it for the disabled ones.
-      local disable_filetypes = { c = true, cpp = true }
+      local disable_filetypes = { cpp = true }
       if disable_filetypes[vim.bo[bufnr].filetype] then
         return nil
       else
@@ -29,6 +29,7 @@ return { -- Autoformat
       end
     end,
     formatters_by_ft = {
+      c = { "clang_format" },
       lua = { "stylua" },
       swift = { "swiftformat" },
       rust = { "rustfmt" },
