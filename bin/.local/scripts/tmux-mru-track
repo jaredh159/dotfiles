@@ -4,7 +4,7 @@
 # Updates the MRU session list, unless we're in a cycle operation
 
 MRU_FILE="$HOME/.tmux-mru"
-MAX_SESSIONS=5
+MAX_SESSIONS=7
 
 current_session=$(tmux display-message -p '#S')
 

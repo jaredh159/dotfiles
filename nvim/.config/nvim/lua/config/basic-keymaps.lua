@@ -70,6 +70,37 @@ end, { desc = "Find hidden project files (env, claude.*)" })
 -- tmux sessionizer
 vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer.sh<CR>", { desc = "Open tmux sessionizer" })
 
+-- show tmux MRU stack in telescope, select to switch
+vim.keymap.set("n", "<leader>mm", function()
+  local lines = vim.fn.readfile(vim.fn.expand("~/.tmux-mru"))
+  if #lines == 0 then
+    vim.notify("MRU stack is empty", vim.log.levels.WARN)
+    return
+  end
+  local pickers = require("telescope.pickers")
+  local finders = require("telescope.finders")
+  local conf = require("telescope.config").values
+  local actions = require("telescope.actions")
+  local action_state = require("telescope.actions.state")
+  pickers
+    .new(require("telescope.themes").get_dropdown({ previewer = false }), {
+      prompt_title = "Tmux MRU Sessions",
+      finder = finders.new_table({ results = lines }),
+      sorter = conf.generic_sorter({}),
+      attach_mappings = function(prompt_bufnr)
+        actions.select_default:replace(function()
+          local selection = action_state.get_selected_entry()
+          actions.close(prompt_bufnr)
+          if selection then
+            vim.fn.system("tmux switch-client -t " .. vim.fn.shellescape(selection[1]))
+          end
+        end)
+        return true
+      end,
+    })
+    :find()
+end, { desc = "Tmux MRU sessions" })
+
 -- custom homegown command palette goodness
 vim.keymap.set("n", "<leader>cp", ":CommandPalette<CR>", { desc = "Toggle custom command palette" })
 
