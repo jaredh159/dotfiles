@@ -70,13 +70,15 @@ export async function create(slug: string): Promise<void> {
     `set -e`,
     `log="${logFile}"`,
     `failed=0`,
+    `cleanup() { [ $failed -eq 1 ] && mv "$log" "${errorLog}" || rm -f "$log"; }`,
+    `trap cleanup EXIT`,
     `run() { "$@" >> "$log" 2>&1 || failed=1; }`,
     ``,
     `run createdb -T ${TEMPLATE_DATABASE} ${dbName}`,
     `run createdb ${testDbName}`,
     `run git init "${target}"`,
     `run git -C "${target}" remote add origin ${REPO_SSH}`,
-    `run git -C "${target}" fetch --depth 50 --single-branch origin`,
+    `run git -C "${target}" fetch --depth 50 origin master`,
     `run git -C "${target}" checkout -b "${slug}" FETCH_HEAD`,
     ``,
     ...envCopyCmds,
@@ -111,8 +113,6 @@ export async function create(slug: string): Promise<void> {
     `kill $sb_pid 2>/dev/null || true`,
     `lsof -ti :${ports.storybook} | xargs kill 2>/dev/null || true`,
     `wait $sb_pid 2>/dev/null || true`,
-    ``,
-    `[ $failed -eq 1 ] && mv "$log" "${errorLog}" || rm -f "$log"`,
   ];
 
   background(cmds, { cwd: TASKS_DIR, logFile });
