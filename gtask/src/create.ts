@@ -52,11 +52,15 @@ export async function create(slug: string): Promise<void> {
   const logFile = join(tmpdir(), `gtask-${dirName}.log`);
   const errorLog = join(target, ".gtask-error.log");
 
+  // write slot+ports to target dir immediately so concurrent
+  // `allocateSlot()` calls see this slot as occupied
+  mkdirSync(target, { recursive: true });
+  writeFileSync(join(target, SLOT_FILE), String(slot) + "\n");
+  writeFileSync(join(target, PORTS_FILE), portsFileContent(ports));
+
   const staging = join(tmpdir(), `gtask-staging-${dirName}`);
   mkdirSync(staging, { recursive: true });
   writeEnvFiles(staging, dbName, testDbName, ports);
-  writeFileSync(join(staging, SLOT_FILE), String(slot) + "\n");
-  writeFileSync(join(staging, PORTS_FILE), portsFileContent(ports));
 
   const envCopyCmds = ENV_TEMPLATES.map(({ dest }) =>
     `run cp "${join(staging, dest)}" "${join(target, dest)}"`
@@ -70,12 +74,12 @@ export async function create(slug: string): Promise<void> {
     ``,
     `run createdb -T ${TEMPLATE_DATABASE} ${dbName}`,
     `run createdb ${testDbName}`,
-    `run git clone --depth 50 --single-branch ${REPO_SSH} "${target}"`,
-    `run git -C "${target}" checkout -b "${slug}"`,
+    `run git init "${target}"`,
+    `run git -C "${target}" remote add origin ${REPO_SSH}`,
+    `run git -C "${target}" fetch --depth 50 --single-branch origin`,
+    `run git -C "${target}" checkout -b "${slug}" FETCH_HEAD`,
     ``,
     ...envCopyCmds,
-    `cp "${join(staging, SLOT_FILE)}" "${join(target, SLOT_FILE)}"`,
-    `cp "${join(staging, PORTS_FILE)}" "${join(target, PORTS_FILE)}"`,
     `rm -rf "${staging}"`,
     ``,
     `cd "${join(target, "swift")}"`,
