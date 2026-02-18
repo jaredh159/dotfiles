@@ -68,6 +68,12 @@ export async function clean(): Promise<void> {
     ];
   });
 
+  const mruFile = join(process.env.HOME ?? "", ".tmux-mru");
+  const mruEjects = toDelete.map((dir) => {
+    const dirname = basename(dir);
+    return `grep -v "^${dirname}$" "${mruFile}" > "${mruFile}.tmp" && mv "${mruFile}.tmp" "${mruFile}" || true`;
+  });
+
   const dbDrops = toDelete.flatMap((dir) => {
     const dbName = dbNameFromDir(basename(dir));
     return [
@@ -79,6 +85,7 @@ export async function clean(): Promise<void> {
   const deletions = toDelete.map((dir) => `rm -rf "${dir}" 2>/dev/null || true`);
 
   const cmds = [
+    ...mruEjects,
     ...portKills,
     ...tmuxKills,
     ...dbDrops,
