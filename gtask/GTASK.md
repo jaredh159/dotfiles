@@ -10,7 +10,7 @@ run with Node's native type stripping (no build step). Zero npm dependencies.
 
 ## What `create` does
 
-1. Allocates a port slot (0–9) by scanning existing tasks
+1. Allocates a port slot (0–29) by scanning existing tasks
 2. Writes env files and port/slot config to a tmpdir staging area
 3. Kicks off a background process that:
    - Creates per-task databases from `gertrude_sync` template

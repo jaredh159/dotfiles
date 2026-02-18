@@ -22,10 +22,10 @@ export function portsForSlot(slot: number): TaskPorts {
 
 export function allocateSlot(): number {
   const used = usedSlots();
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 30; i++) {
     if (!used.has(i)) return i;
   }
-  throw new Error("no available slots (max 10 concurrent tasks)");
+  throw new Error("no available slots (max 30 concurrent tasks)");
 }
 
 export function readSlot(taskDir: string): number | null {

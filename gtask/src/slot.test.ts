@@ -30,13 +30,13 @@ describe("portsForSlot", () => {
     assert.strictEqual(ports.storybook, 6026);
   });
 
-  it("handles slot 9 (max)", () => {
-    const ports = portsForSlot(9);
-    assert.strictEqual(ports.api, 8170);
-    assert.strictEqual(ports.dash, 8171);
-    assert.strictEqual(ports.site, 3090);
-    assert.strictEqual(ports.admin, 4333);
-    assert.strictEqual(ports.storybook, 6096);
+  it("handles slot 29 (max)", () => {
+    const ports = portsForSlot(29);
+    assert.strictEqual(ports.api, 8370);
+    assert.strictEqual(ports.dash, 8371);
+    assert.strictEqual(ports.site, 3290);
+    assert.strictEqual(ports.admin, 4533);
+    assert.strictEqual(ports.storybook, 6296);
   });
 });
 
