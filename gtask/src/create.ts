@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync, statfsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { makeTargetDir, dbNameFromDir } from "./parse.ts";
@@ -34,12 +34,21 @@ function writeEnvFiles(stagingDir: string, dbName: string, testDbName: string, p
   }
 }
 
+const MIN_DISK_GB = 15;
+
 export async function create(slug: string): Promise<void> {
   const dirName = makeTargetDir(slug);
   const target = join(TASKS_DIR, dirName);
 
   if (existsSync(target)) {
     console.error(`Target already exists: ${target}`);
+    process.exit(1);
+  }
+
+  const { bavail, bsize } = statfsSync(TASKS_DIR);
+  const availGB = (bavail * bsize) / 1_073_741_824;
+  if (availGB < MIN_DISK_GB) {
+    console.error(`Not enough disk space: ${availGB.toFixed(1)}GB available, ${MIN_DISK_GB}GB required`);
     process.exit(1);
   }
 
