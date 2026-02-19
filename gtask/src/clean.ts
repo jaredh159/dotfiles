@@ -3,9 +3,9 @@ import { join, basename } from "node:path";
 import { parseBranchFromDir, dbNameFromDir } from "./parse.ts";
 import { execSafe } from "./exec.ts";
 import { background } from "./exec.ts";
-import { red, green } from "./color.ts";
+import { red, green, yellow } from "./color.ts";
 import { readSlot, portsForSlot } from "./slot.ts";
-import { TASKS_DIR, REPO } from "./constants.ts";
+import { TASKS_DIR, REPO, DISCARD_FILE } from "./constants.ts";
 
 function getMergedPrCount(branch: string): number {
   const result = execSafe(
@@ -27,16 +27,29 @@ export async function clean(): Promise<void> {
   const toDelete: string[] = [];
   const toKeep: string[] = [];
 
+  const discarded: string[] = [];
+
   for (const dirname of entries) {
+    const dir = join(TASKS_DIR, dirname);
+
+    if (existsSync(join(dir, DISCARD_FILE))) {
+      discarded.push(dir);
+      continue;
+    }
+
     const branch = parseBranchFromDir(dirname);
     if (!branch) continue;
 
     const merged = getMergedPrCount(branch);
     if (merged > 0) {
-      toDelete.push(join(TASKS_DIR, dirname));
+      toDelete.push(dir);
     } else {
       toKeep.push(dirname);
     }
+  }
+
+  for (const dir of discarded) {
+    console.log(yellow(`discard:  ${basename(dir)}`));
   }
 
   for (const dir of toDelete) {
@@ -46,6 +59,8 @@ export async function clean(): Promise<void> {
   for (const dirname of toKeep) {
     console.log(green(`keeping:  ${dirname}`));
   }
+
+  toDelete.push(...discarded);
 
   if (toDelete.length === 0) return;
 
