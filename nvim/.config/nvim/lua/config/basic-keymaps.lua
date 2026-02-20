@@ -61,6 +61,7 @@ vim.keymap.set("n", "<leader>hh", function()
       "-g", "**/claude.task.md",
       "-g", "**/claude.ledger.*.md",
       "-g", "**/claude.report.*.md",
+      "-g", "**/task.scratch.md",
       "-g", "**/.env*",
       "-g", "**/Local.xcconfig",
     },
