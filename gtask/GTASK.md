@@ -7,6 +7,8 @@ run with Node's native type stripping (no build step). Zero npm dependencies.
 
 - `gtask <slug>` — create a new task directory at `~/gertie/tasks/<slug>-<MMDDYY>/`
 - `gtask --clean` — remove task directories whose PRs have been merged
+- `gtask --discard` — mark current task for cleanup without merge check
+- `gtask --keep` — toggle protection on current task (prevents cleanup even if merged)
 
 ## What `create` does
 
@@ -59,6 +61,8 @@ env vars defined in `secrets.local` (sourced in `.zshrc`). Task-specific values
 - `src/main.ts` — CLI entry point
 - `src/create.ts` — task creation
 - `src/clean.ts` — merged task cleanup
+- `src/discard.ts` — mark task for discard
+- `src/keep.ts` — toggle keep protection on task
 - `src/slot.ts` — slot allocation and port calculation
 - `src/template.ts` — env template resolution
 - `src/parse.ts` — dir name parsing, datestamp, db name derivation

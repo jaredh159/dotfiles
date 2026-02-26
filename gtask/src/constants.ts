@@ -18,6 +18,7 @@ export const ENV_TEMPLATES = [
 export const SLOT_FILE = ".gtask-slot";
 export const PORTS_FILE = ".gtask-ports";
 export const DISCARD_FILE = ".gtask-discard";
+export const KEEP_FILE = ".gtask-keep";
 export const TEMPLATE_DATABASE = "gertrude_sync";
 
 export const BASE_PORTS = {

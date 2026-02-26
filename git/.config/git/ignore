@@ -6,3 +6,4 @@ claude.task.md
 claude.ledger.*.md
 claude.report.*.md
 task.scratch.md
+.gtask-*
