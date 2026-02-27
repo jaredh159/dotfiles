@@ -1,6 +1,6 @@
 import { writeFileSync, existsSync, unlinkSync } from "node:fs";
 import { join, relative } from "node:path";
-import { TASKS_DIR, KEEP_FILE } from "./constants.ts";
+import { TASKS_DIR, KEEP_FILE, DISCARD_FILE } from "./constants.ts";
 import { cyan } from "./color.ts";
 
 export function keep(): void {
@@ -20,6 +20,9 @@ export function keep(): void {
     console.log(cyan(`unmarked: ${relative(TASKS_DIR, taskRoot)}`));
     return;
   }
+
+  const discardMarker = join(taskRoot, DISCARD_FILE);
+  if (existsSync(discardMarker)) unlinkSync(discardMarker);
 
   writeFileSync(marker, "");
   console.log(cyan(`marked as keep: ${relative(TASKS_DIR, taskRoot)}`));
