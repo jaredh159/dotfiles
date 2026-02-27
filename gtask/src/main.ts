@@ -2,6 +2,7 @@ import { create } from "./create.ts";
 import { clean } from "./clean.ts";
 import { discard } from "./discard.ts";
 import { keep } from "./keep.ts";
+import { sync } from "./sync.ts";
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -11,6 +12,7 @@ if (!command) {
   console.log("       gtask --clean");
   console.log("       gtask --discard");
   console.log("       gtask --keep");
+  console.log("       gtask --sync");
   process.exit(1);
 }
 
@@ -20,6 +22,8 @@ if (command === "--clean") {
   discard();
 } else if (command === "--keep") {
   keep();
+} else if (command === "--sync") {
+  sync();
 } else {
   await create(command);
 }
