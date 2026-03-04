@@ -1,6 +1,6 @@
-import { existsSync, mkdirSync, writeFileSync, statfsSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync, statSync, statfsSync } from "node:fs";
 import { join, dirname } from "node:path";
-import { tmpdir } from "node:os";
+import { homedir, tmpdir } from "node:os";
 import { makeTargetDir, dbNameFromDir } from "./parse.ts";
 import { background } from "./exec.ts";
 import { loadTemplate, resolveTemplate, buildTemplateVars } from "./template.ts";
@@ -50,6 +50,17 @@ export async function create(slug: string): Promise<void> {
   if (availGB < MIN_DISK_GB) {
     console.error(`Not enough disk space: ${availGB.toFixed(1)}GB available, ${MIN_DISK_GB}GB required`);
     process.exit(1);
+  }
+
+  const syncFile = join(homedir(), ".gtask-last-sync");
+  try {
+    const age = Date.now() - statSync(syncFile).mtimeMs;
+    if (age > 2 * 60 * 60 * 1000) {
+      const hrs = (age / 3_600_000).toFixed(1);
+      console.log(`⚠ gertrude_sync is ${hrs}hrs old (launchd sync may not be running)`);
+    }
+  } catch {
+    console.log(`⚠ gertrude_sync age unknown (~/.gtask-last-sync missing)`);
   }
 
   const slot = allocateSlot();

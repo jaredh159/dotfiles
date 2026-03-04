@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export PATH="/opt/homebrew/opt/postgresql@17/bin:/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+
+# Time gating: weekdays 6am-5pm only
+DOW=$(date +%u) # 1=Mon, 7=Sun
+HOUR=$((10#$(date +%H)))
+if [[ $DOW -gt 5 || $HOUR -lt 6 || $HOUR -ge 17 ]]; then
+  echo "Outside sync window (weekdays 6am-5pm), skipping"
+  exit 0
+fi
+
+SYNC_DIR="$HOME/gertie/infra"
+if [[ ! -f "$SYNC_DIR/db-sync.mjs" ]]; then
+  echo "ERROR: $SYNC_DIR/db-sync.mjs not found"
+  osascript -e 'display notification "db-sync.mjs not found" with title "gertrude-db-sync"'
+  exit 1
+fi
+
+echo "$(date): Starting gertrude_sync refresh..."
+if node "$SYNC_DIR/db-sync.mjs"; then
+  touch "$HOME/.gtask-last-sync"
+  echo "$(date): Sync complete"
+else
+  echo "$(date): Sync FAILED"
+  osascript -e 'display notification "gertrude_sync refresh failed" with title "gertrude-db-sync"'
+  exit 1
+fi

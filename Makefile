@@ -10,5 +10,6 @@ stow:
 	stow kitty
 	stow claude
 	stow dictator
+	stow launchd
 
 .PHONY: stow
