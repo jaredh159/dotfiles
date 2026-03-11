@@ -98,8 +98,8 @@ export async function create(slug: string): Promise<void> {
     `run createdb ${testDbName}`,
     `run git init "${target}"`,
     `run git -C "${target}" remote add origin ${REPO_SSH}`,
-    `run git -C "${target}" fetch --depth 50 origin master`,
-    `run git -C "${target}" checkout -b "${slug}" FETCH_HEAD`,
+    `run git -C "${target}" fetch --depth 1 origin master`,
+    `run git -C "${target}" checkout -b "${slug}" origin/master`,
     ``,
     ...envCopyCmds,
     `rm -rf "${staging}"`,
@@ -133,6 +133,9 @@ export async function create(slug: string): Promise<void> {
     `kill $sb_pid 2>/dev/null || true`,
     `lsof -ti :${ports.storybook} | xargs kill 2>/dev/null || true`,
     `wait $sb_pid 2>/dev/null || true`,
+    ``,
+    `# best-effort history deepen after the task is already usable`,
+    `git -C "${target}" fetch --deepen=49 origin master >> "$log" 2>&1 || true`,
   ];
 
   background(cmds, { cwd: TASKS_DIR, logFile });
