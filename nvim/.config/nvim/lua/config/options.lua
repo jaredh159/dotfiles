@@ -1,6 +1,14 @@
 -- Don't show the mode, since it's already in the status line
 vim.o.showmode = false
 
+local shada_dir = vim.fn.stdpath("state") .. "/shada"
+for _, file in ipairs(vim.fn.glob(shada_dir .. "/main.shada.tmp.*", false, true)) do
+  local age = vim.fn.localtime() - vim.fn.getftime(file)
+  if age > 3600 then
+    pcall(vim.fn.delete, file)
+  end
+end
+
 -- tab stuff
 vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
