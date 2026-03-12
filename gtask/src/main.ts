@@ -3,27 +3,38 @@ import { clean } from "./clean.ts";
 import { discard } from "./discard.ts";
 import { keep } from "./keep.ts";
 import { sync } from "./sync.ts";
+import { parseArgs, usageLines } from "./cli.ts";
 
-const args = process.argv.slice(2);
-const command = args[0];
+function printUsage(): void {
+  for (const line of usageLines()) {
+    console.log(line);
+  }
+}
 
-if (!command) {
-  console.log("usage: gtask <slug>");
-  console.log("       gtask --clean");
-  console.log("       gtask --discard");
-  console.log("       gtask --keep");
-  console.log("       gtask --sync");
+let parsed;
+try {
+  parsed = parseArgs(process.argv.slice(2));
+} catch (error) {
+  if (error instanceof Error) {
+    console.error(error.message);
+  }
+  printUsage();
   process.exit(1);
 }
 
-if (command === "--clean") {
+if (parsed.type === "help") {
+  printUsage();
+  process.exit(0);
+}
+
+if (parsed.type === "clean") {
   await clean();
-} else if (command === "--discard") {
+} else if (parsed.type === "discard") {
   discard();
-} else if (command === "--keep") {
+} else if (parsed.type === "keep") {
   keep();
-} else if (command === "--sync") {
+} else if (parsed.type === "sync") {
   sync();
 } else {
-  await create(command);
+  await create(parsed.slug);
 }
