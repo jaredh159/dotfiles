@@ -18,7 +18,6 @@ DEFAULT_USER="jared"
 
 plugins=(git)
 
-source $HOME/.zshenv
 source $ZSH/oh-my-zsh.sh
 source $ZSH/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 source $HOME/.cargo/env # rust
@@ -147,6 +146,9 @@ esac
 # Added by LM Studio CLI (lms)
 export PATH="$PATH:/Users/jared/.lmstudio/bin"
 # End of LM Studio CLI section
+
+# Machine-specific shell overrides that should win after shared PATH setup.
+[ -f "$HOME/.dotfiles/zsh.local" ] && source "$HOME/.dotfiles/zsh.local"
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh

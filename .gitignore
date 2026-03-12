@@ -5,4 +5,5 @@ node_modules/
 karabiner/.config/karabiner/automatic_backups/
 nvim/.config/nvim/plugin/packer_compiled.lua
 secrets.local
+zsh.local
 dictator/.config/dictator/dictator.secrets.toml
