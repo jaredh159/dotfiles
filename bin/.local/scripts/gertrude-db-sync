@@ -3,6 +3,38 @@ set -euo pipefail
 
 export PATH="/opt/homebrew/opt/postgresql@17/bin:/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 
+PGDATA="/opt/homebrew/var/postgresql@17"
+PGPID="$PGDATA/postmaster.pid"
+PGSERVICE="postgresql@17"
+
+ensure_postgres() {
+  if pg_isready -q; then
+    return 0
+  fi
+
+  if [[ -f "$PGPID" ]]; then
+    local pid
+    pid=$(head -n 1 "$PGPID" 2>/dev/null || true)
+    if [[ -n "$pid" ]] && ! pgrep -f "/opt/homebrew/.*/postgres.*-D $PGDATA" >/dev/null 2>&1; then
+      echo "$(date): Removing stale postmaster.pid (recorded PID $pid is not a live postgres process)"
+      rm -f "$PGPID"
+    fi
+  fi
+
+  echo "$(date): Starting Homebrew Postgres service..."
+  brew services start "$PGSERVICE"
+
+  for _ in $(seq 1 20); do
+    if pg_isready -q; then
+      return 0
+    fi
+    sleep 1
+  done
+
+  echo "$(date): ERROR: local Postgres did not become ready"
+  return 1
+}
+
 # Time gating: weekdays 6am-5pm only
 DOW=$(date +%u) # 1=Mon, 7=Sun
 HOUR=$((10#$(date +%H)))
@@ -15,6 +47,11 @@ SYNC_DIR="$HOME/gertie/infra"
 if [[ ! -f "$SYNC_DIR/db-sync.mjs" ]]; then
   echo "ERROR: $SYNC_DIR/db-sync.mjs not found"
   osascript -e 'display notification "db-sync.mjs not found" with title "gertrude-db-sync"'
+  exit 1
+fi
+
+if ! ensure_postgres; then
+  osascript -e 'display notification "local Postgres did not start" with title "gertrude-db-sync"'
   exit 1
 fi
 
