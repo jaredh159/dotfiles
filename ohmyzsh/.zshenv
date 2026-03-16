@@ -24,6 +24,9 @@ export ANDROID_HOME=$HOME/Library/Android/sdk
 # swift/gertrude
 export TASK_MEGA_YIELD_COUNT=100
 
+# Source secrets if they exist.
+[ -f "$HOME/.dotfiles/secrets.local" ] && source "$HOME/.dotfiles/secrets.local"
+
 # temp claude issues
 # export CLAUDE_CODE_DISABLE_AUTO_UPDATE=1
 # export DISABLE_AUTOUPDATER=1

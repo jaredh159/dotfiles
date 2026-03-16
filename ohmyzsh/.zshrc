@@ -13,9 +13,6 @@ export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="powerlevel10k/powerlevel10k"
 DEFAULT_USER="jared"
 
-# Source secrets if they exist
-[ -f "$HOME/.dotfiles/secrets.local" ] && source "$HOME/.dotfiles/secrets.local"
-
 plugins=(git)
 
 source $HOME/.zshenv
