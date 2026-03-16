@@ -18,6 +18,7 @@ DEFAULT_USER="jared"
 
 plugins=(git)
 
+source $HOME/.zshenv
 source $ZSH/oh-my-zsh.sh
 source $ZSH/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 source $HOME/.cargo/env # rust
