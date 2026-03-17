@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+
+# Time gating: weekdays 6am-5pm only
+DOW=$(date +%u) # 1=Mon, 7=Sun
+HOUR=$((10#$(date +%H)))
+if [[ $DOW -gt 5 || $HOUR -lt 6 || $HOUR -ge 17 ]]; then
+  echo "Outside sync window (weekdays 6am-5pm), skipping"
+  exit 0
+fi
+
+SYNC_DIR="$HOME/gertie/reference"
+TARGET_BRANCH="master"
+RUN_LOCK_DIR="/tmp/gertrude-reference-sync.lock"
+
+if [[ ! -d "$SYNC_DIR/.git" ]]; then
+  echo "ERROR: $SYNC_DIR is not a git repository"
+  osascript -e 'display notification "reference repo missing or invalid" with title "gertrude-reference-sync"'
+  exit 1
+fi
+
+if ! mkdir "$RUN_LOCK_DIR" 2>/dev/null; then
+  echo "$(date): Another sync is already running, skipping"
+  exit 0
+fi
+trap 'rmdir "$RUN_LOCK_DIR"' EXIT
+
+if [[ -f "$SYNC_DIR/.git/index.lock" ]] && ! pgrep -f "git -C $SYNC_DIR" >/dev/null 2>&1; then
+  echo "$(date): Removing stale git index.lock"
+  rm -f "$SYNC_DIR/.git/index.lock"
+fi
+
+echo "$(date): Refreshing $SYNC_DIR on $TARGET_BRANCH"
+if [[ -n "$(git -C "$SYNC_DIR" status --short --untracked-files=all)" ]]; then
+  STASH_MSG="gertrude-reference-sync $(date '+%Y-%m-%d %H:%M:%S')"
+  echo "$(date): Stashing local changes as: $STASH_MSG"
+  git -C "$SYNC_DIR" stash push --include-untracked --message "$STASH_MSG"
+fi
+git -C "$SYNC_DIR" fetch origin "$TARGET_BRANCH"
+git -C "$SYNC_DIR" checkout -B "$TARGET_BRANCH" "origin/$TARGET_BRANCH"
+git -C "$SYNC_DIR" reset --hard "origin/$TARGET_BRANCH"
+echo "$(date): Reference sync complete"
