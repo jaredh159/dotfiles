@@ -4,6 +4,7 @@ Session.vim
 **/.claude/settings.local.json
 claude.task.md
 claude.ledger.*.md
+claude.plan.*.md
 claude.report.*.md
 task.scratch.md
 .gtask-*
