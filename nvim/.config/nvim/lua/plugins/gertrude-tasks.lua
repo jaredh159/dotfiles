@@ -4,13 +4,9 @@ local finders = require("telescope.finders")
 local conf = require("telescope.config").values
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
+local tmux_projects = require("config.tmux_projects")
 
-local TASKS_DIR = vim.fn.expand("$HOME/gertie/tasks")
-
--- TODO: remove when supervision tool work calms down
-local ALWAYS_INCLUDE = {
-  vim.fn.expand("$HOME/gertie/supervise"),
-}
+local TASKS_DIR = tmux_projects.TASKS_DIR
 
 local function get_tasks_sorted_by_mtime()
   local tasks = {}
@@ -31,6 +27,7 @@ local function get_tasks_sorted_by_mtime()
         table.insert(tasks, {
           name = name,
           path = path,
+          display_name = tmux_projects.display_name_for_path(path),
           mtime = stat.mtime.sec,
         })
       end
@@ -42,13 +39,14 @@ local function get_tasks_sorted_by_mtime()
   for _, task in ipairs(tasks) do
     seen[task.path] = true
   end
-  for _, path in ipairs(ALWAYS_INCLUDE) do
+  for _, path in ipairs(tmux_projects.always_include_paths()) do
     if not seen[path] then
       local stat = vim.loop.fs_stat(path)
       if stat then
         table.insert(tasks, {
           name = vim.fn.fnamemodify(path, ":t"),
           path = path,
+          display_name = tmux_projects.display_name_for_path(path),
           mtime = stat.mtime.sec,
         })
       end
@@ -66,6 +64,7 @@ end
 local function gertrude_tasks(opts)
   opts = opts or {}
   local tasks = get_tasks_sorted_by_mtime()
+  local mru_lookup = tmux_projects.read_mru_lookup()
   local cwd = vim.fn.getcwd()
 
   -- filter out current task
@@ -86,8 +85,8 @@ local function gertrude_tasks(opts)
         entry_maker = function(entry)
           return {
             value = entry,
-            display = entry.name,
-            ordinal = entry.name,
+            display = tmux_projects.task_picker_display(entry, mru_lookup),
+            ordinal = entry.display_name,
           }
         end,
       }),
@@ -97,7 +96,7 @@ local function gertrude_tasks(opts)
           actions.close(prompt_bufnr)
           local selection = action_state.get_selected_entry()
           local path = selection.value.path
-          local session_name = selection.value.name:gsub("%.", "_")
+          local session_name = tmux_projects.session_name_for_path(path)
 
           -- create session if it doesn't exist, then switch to it
           vim.fn.system(string.format(
