@@ -87,4 +87,14 @@ describe("buildTemplateVars", () => {
     assert.strictEqual(vars.GTASK_OVERRIDE, "from_task");
     delete process.env.GTASK_OVERRIDE;
   });
+
+  it("includes GTASK_NGROK_SUBDOMAIN for templates", () => {
+    process.env.GTASK_NGROK_SUBDOMAIN = "sweet-carefully-tarpon";
+    const vars = buildTemplateVars({});
+    assert.strictEqual(
+      vars.GTASK_NGROK_SUBDOMAIN,
+      "sweet-carefully-tarpon"
+    );
+    delete process.env.GTASK_NGROK_SUBDOMAIN;
+  });
 });

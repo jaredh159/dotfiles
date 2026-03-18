@@ -1,1 +1,1 @@
-LOCAL_API_URL = https:/$()/sweet-carefully-tarpon.ngrok-free.app
+LOCAL_API_URL = https:/$()/{{GTASK_NGROK_SUBDOMAIN}}.ngrok-free.app

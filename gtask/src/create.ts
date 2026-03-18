@@ -65,6 +65,7 @@ export async function create(slug: string): Promise<void> {
 
   const slot = allocateSlot();
   const ports = portsForSlot(slot);
+  const ngrokSubdomain = process.env.GTASK_NGROK_SUBDOMAIN;
 
   const dbName = dbNameFromDir(dirName);
   const testDbName = `${dbName}_test`;
@@ -76,7 +77,10 @@ export async function create(slug: string): Promise<void> {
   // `allocateSlot()` calls see this slot as occupied
   mkdirSync(target, { recursive: true });
   writeFileSync(join(target, SLOT_FILE), String(slot) + "\n");
-  writeFileSync(join(target, PORTS_FILE), portsFileContent(ports));
+  writeFileSync(
+    join(target, PORTS_FILE),
+    portsFileContent(ports, { ngrokSubdomain })
+  );
 
   const staging = join(tmpdir(), `gtask-staging-${dirName}`);
   mkdirSync(staging, { recursive: true });

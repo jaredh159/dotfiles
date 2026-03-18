@@ -10,6 +10,10 @@ export interface TaskPorts {
   storybook: number;
 }
 
+export interface PortsFileOptions {
+  ngrokSubdomain?: string;
+}
+
 export function portsForSlot(slot: number): TaskPorts {
   return {
     api: BASE_PORTS.api + slot * 10,
@@ -35,15 +39,24 @@ export function readSlot(taskDir: string): number | null {
   return isNaN(val) ? null : val;
 }
 
-export function portsFileContent(ports: TaskPorts): string {
-  return [
+export function portsFileContent(
+  ports: TaskPorts,
+  options: PortsFileOptions = {}
+): string {
+  const lines = [
     `API_PORT=${ports.api}`,
     `DASH_PORT=${ports.dash}`,
     `SITE_PORT=${ports.site}`,
     `ADMIN_PORT=${ports.admin}`,
     `STORYBOOK_PORT=${ports.storybook}`,
-    ``,
-  ].join("\n");
+  ];
+
+  if (options.ngrokSubdomain) {
+    lines.push(`NGROK_SUBDOMAIN=${options.ngrokSubdomain}`);
+  }
+
+  lines.push(``);
+  return lines.join("\n");
 }
 
 function usedSlots(): Set<number> {

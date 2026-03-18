@@ -43,7 +43,8 @@ Five services get ports offset by `slot × 10` from their base:
 
 Slot 0 = default ports. Slot 1 = 8090, 8091, 3010, etc. The monorepo justfiles read
 `.gtask-ports` (shell-sourceable) via `set dotenv-filename`, falling back to defaults
-when absent.
+when absent. If `GTASK_NGROK_SUBDOMAIN` is set in your local shell environment,
+gtask also writes `NGROK_SUBDOMAIN=...` into `.gtask-ports`.
 
 ## Database isolation
 
@@ -55,7 +56,8 @@ when absent.
 
 Templates live in `gtask/env/` with `{{PLACEHOLDER}}` syntax. Secrets come from `GTASK_*`
 env vars defined in `secrets.local` (sourced in `.zshrc`). Task-specific values
-(`TASK_DATABASE_NAME`, `TASK_API_PORT`, etc.) are injected at creation time.
+(`TASK_DATABASE_NAME`, `TASK_API_PORT`, etc.) are injected at creation time. This
+includes `GTASK_NGROK_SUBDOMAIN` for local iOS/ngrok configuration.
 
 ## Source files
 

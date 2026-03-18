@@ -56,4 +56,13 @@ describe("portsFileContent", () => {
     const lines = portsFileContent(ports).trim().split("\n");
     assert.strictEqual(lines.length, 5);
   });
+
+  it("includes ngrok subdomain when configured", () => {
+    const ports = portsForSlot(0);
+    const lines = portsFileContent(ports, {
+      ngrokSubdomain: "sweet-carefully-tarpon",
+    }).trim().split("\n");
+    assert.ok(lines.includes("NGROK_SUBDOMAIN=sweet-carefully-tarpon"));
+    assert.strictEqual(lines.length, 6);
+  });
 });
