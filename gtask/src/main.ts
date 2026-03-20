@@ -36,5 +36,5 @@ if (parsed.type === "clean") {
 } else if (parsed.type === "sync") {
   sync();
 } else {
-  await create(parsed.slug);
+  await create(parsed.slug, { light: parsed.light });
 }

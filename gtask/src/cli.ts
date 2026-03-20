@@ -1,5 +1,5 @@
 export type ParsedCommand =
-  | { type: "create"; slug: string }
+  | { type: "create"; slug: string; light: boolean }
   | { type: "clean" | "discard" | "keep" | "sync" | "help" };
 
 const FLAG_COMMANDS = new Map<string, ParsedCommand["type"]>([
@@ -13,6 +13,7 @@ const FLAG_COMMANDS = new Map<string, ParsedCommand["type"]>([
 
 const RESERVED_WORDS = new Set(["clean", "discard", "keep", "sync", "help"]);
 const VALID_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const CREATE_FLAGS = new Set(["--light"]);
 
 function levenshtein(a: string, b: string): number {
   const prev = Array.from({ length: b.length + 1 }, (_, i) => i);
@@ -55,6 +56,7 @@ function findSuggestion(input: string): string | null {
 export function usageLines(): string[] {
   return [
     "usage: gtask <slug>",
+    "       gtask --light <slug>",
     "       gtask --clean",
     "       gtask --discard",
     "       gtask --keep",
@@ -63,11 +65,49 @@ export function usageLines(): string[] {
 }
 
 export function parseArgs(args: string[]): ParsedCommand {
-  if (args.length !== 1) {
-    throw new Error("Expected exactly one argument.");
+  if (args.length === 0 || args.length > 2) {
+    throw new Error("Expected a slug or one command flag.");
   }
 
-  const input = args[0];
+  if (args.length === 1) {
+    const input = args[0];
+    const flagCommand = FLAG_COMMANDS.get(input);
+    if (flagCommand) {
+      return { type: flagCommand };
+    }
+
+    if (CREATE_FLAGS.has(input)) {
+      throw new Error("`--light` must be used with a task slug.");
+    }
+
+    return parseSlug(input, false);
+  }
+
+  const [first, second] = args;
+  if (first === "--light") {
+    return parseSlug(second, true);
+  }
+
+  if (second === "--light") {
+    return parseSlug(first, true);
+  }
+
+  const flagCommand = FLAG_COMMANDS.get(first) ?? FLAG_COMMANDS.get(second);
+  if (flagCommand) {
+    throw new Error(`\`${flagCommand}\` does not take an extra argument.`);
+  }
+
+  if (first.startsWith("--") || second.startsWith("--")) {
+    const flag = first.startsWith("--") ? first : second;
+    const suggestion = findSuggestion(flag);
+    const suffix = suggestion ? ` Did you mean \`gtask --${suggestion}\`?` : "";
+    throw new Error(`Unknown flag: ${flag}.${suffix}`);
+  }
+
+  throw new Error("Expected a single task slug.");
+}
+
+function parseSlug(input: string, light: boolean): ParsedCommand {
   const flagCommand = FLAG_COMMANDS.get(input);
   if (flagCommand) {
     return { type: flagCommand };
@@ -98,5 +138,5 @@ export function parseArgs(args: string[]): ParsedCommand {
     );
   }
 
-  return { type: "create", slug: input };
+  return { type: "create", slug: input, light };
 }

@@ -6,6 +6,7 @@ run with Node's native type stripping (no build step). Zero npm dependencies.
 ## Commands
 
 - `gtask <slug>` — create a new task directory at `~/gertie/tasks/<slug>-<MMDDYY>/`
+- `gtask --light <slug>` — create a new task directory but skip the expensive warm-up steps
 - `gtask --clean` — remove task directories whose PRs have been merged
 - `gtask --discard` — mark current task for cleanup without merge check
 - `gtask --keep` — toggle protection on current task (prevents cleanup even if merged)
@@ -20,6 +21,11 @@ run with Node's native type stripping (no build step). Zero npm dependencies.
    - Clones the monorepo, checks out a new branch
    - Copies env files and `.gtask-slot`/`.gtask-ports` into the task dir
    - Warms caches: `pnpm install`, `just build`, xcode builds, tests, lint
+   - Deepens the shallow clone after the task is otherwise ready
+
+With `--light`, gtask still creates the task dir, databases, env files, branch, and post-create
+Git history deepen, but skips the warm-up work such as migrations, installs, builds, checks, tests,
+and storybook cache priming.
 
 Returns to the shell immediately — only the staging dir setup is synchronous.
 

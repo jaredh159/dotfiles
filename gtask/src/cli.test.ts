@@ -7,6 +7,20 @@ describe("parseArgs", () => {
     assert.deepStrictEqual(parseArgs(["fix-login"]), {
       type: "create",
       slug: "fix-login",
+      light: false,
+    });
+  });
+
+  it("parses light create mode", () => {
+    assert.deepStrictEqual(parseArgs(["--light", "fix-login"]), {
+      type: "create",
+      slug: "fix-login",
+      light: true,
+    });
+    assert.deepStrictEqual(parseArgs(["fix-login", "--light"]), {
+      type: "create",
+      slug: "fix-login",
+      light: true,
     });
   });
 
@@ -45,7 +59,11 @@ describe("parseArgs", () => {
   });
 
   it("rejects extra arguments", () => {
-    assert.throws(() => parseArgs(["fix-login", "extra"]), /Expected exactly one argument\./);
+    assert.throws(() => parseArgs(["fix-login", "extra"]), /Expected a single task slug\./);
+  });
+
+  it("rejects bare light flag", () => {
+    assert.throws(() => parseArgs(["--light"]), /`--light` must be used with a task slug\./);
   });
 
   it("supports help flags", () => {
@@ -58,6 +76,7 @@ describe("usageLines", () => {
   it("includes the supported commands", () => {
     assert.deepStrictEqual(usageLines(), [
       "usage: gtask <slug>",
+      "       gtask --light <slug>",
       "       gtask --clean",
       "       gtask --discard",
       "       gtask --keep",
