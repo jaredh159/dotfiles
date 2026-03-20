@@ -60,7 +60,24 @@ vims() {
   if [ -f Session.vim ]; then
     nvim -S Session.vim
   else
-    nvim -c "silent Obsession Session.vim" .
+    local startup_file=""
+
+    for candidate in README.md README readme.md readme; do
+      if [ -f "$candidate" ]; then
+        startup_file="$candidate"
+        break
+      fi
+    done
+
+    if [ -z "$startup_file" ]; then
+      startup_file=$(find . -maxdepth 1 -type f ! -name "Session.vim" ! -name ".DS_Store" -print | sed 's#^\./##' | sort | head -n 1)
+    fi
+
+    if [ -n "$startup_file" ]; then
+      nvim "$startup_file" -c "silent Obsession Session.vim" -c "NvimTreeFindFile"
+    else
+      nvim -c "silent Obsession Session.vim" -c "NvimTreeOpen" .
+    fi
   fi
 }
 
