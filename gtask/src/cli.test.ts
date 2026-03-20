@@ -81,6 +81,22 @@ describe("usageLines", () => {
       "       gtask --discard",
       "       gtask --keep",
       "       gtask --sync",
+      "",
+      "Creates an isolated Gertrude task dir under ~/gertie/tasks/<slug>-<MMDDYY>.",
+      "Each task gets its own git branch, databases, env files, and reserved port slot.",
+      "",
+      "Create flow:",
+      "  gtask <slug>         Full create: starts warm-up in background.",
+      "  gtask --light <slug> Same immediate setup, skips expensive warm-up steps.",
+      "  The task directory is created immediately.",
+      "  .gtask-slot, .gtask-ports, and local env files are available immediately.",
+      "  That means local task files can be created right away while clone/build/test work continues.",
+      "",
+      "Other commands:",
+      "  gtask --sync         Recreate this task's databases from gertrude_sync, then migrate.",
+      "  gtask --discard      Mark the current task for cleanup even without a merged PR.",
+      "  gtask --keep         Toggle cleanup protection for the current task.",
+      "  gtask --clean        Remove merged/discarded task dirs. ⚠ Only Jared should ever run this.",
     ]);
   });
 });
