@@ -64,6 +64,7 @@ path+=$ANDROID_HOME/platform-tools
 path+=~/.lmstudio/bin
 path+=~/.opencode/bin
 path+=~/.cargo/bin
+export PATH="$PATH:$HOME/jaredh159/agent/bin"
 
 export PATH
 
