@@ -10,6 +10,7 @@ export const TEMPLATE_DIR = join(GTASK_DIR, "env");
 export const ENV_TEMPLATES = [
   { template: "api.env.template", dest: "swift/api/.env" },
   { template: "iosapp.xcconfig.template", dest: "swift/iosapp/config/Local.xcconfig" },
+  { template: "macapp.xcconfig.template", dest: "swift/macapp/config/Local.xcconfig" },
   { template: "dash.env.local.template", dest: "web/dash/app/.env.local" },
   { template: "site.env.local.template", dest: "web/site/.env.local" },
   { template: "admin.env.local.template", dest: "web/admin/.env.local" },
