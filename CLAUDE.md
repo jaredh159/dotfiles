@@ -33,6 +33,7 @@ The Makefile runs `stow <package>` for each directory, creating symlinks.
 | `kitty/`     | Kitty terminal config                   | `~/.config/kitty/`          |
 | `ghostty/`   | Ghostty terminal config                 | `~/.config/ghostty/`        |
 | `claude/`    | Claude CLI settings, commands           | `~/.claude/`                |
+| `codex/`     | Codex global skills                     | `~/.codex/skills/`          |
 | `stow/`      | Stow ignore patterns                    | `~/.stow-global-ignore`     |
 
 ## Key Files
