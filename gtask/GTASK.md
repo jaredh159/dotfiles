@@ -11,6 +11,7 @@ run with Node's native type stripping (no build step). Zero npm dependencies.
 - `gtask --discard` — mark current task for cleanup without merge check
 - `gtask --keep` — toggle protection on current task (prevents cleanup even if merged)
 - `gtask --sync` — drop and recreate current task's databases from `gertrude_sync`, then migrate
+- `gtask --heavy` — from inside a task dir, run the full warm-up/build/test pass that `--light` skips
 
 ## What `create` does
 
@@ -26,6 +27,9 @@ run with Node's native type stripping (no build step). Zero npm dependencies.
 With `--light`, gtask still creates the task dir, databases, env files, branch, and post-create
 Git history deepen, but skips the warm-up work such as migrations, installs, builds, checks, tests,
 and storybook cache priming.
+
+If you start light and later want the full deep-work pass, run `gtask --heavy` from anywhere inside
+that task directory. It backgrounds the same warm-up sequence used by a normal full create.
 
 Returns to the shell immediately — only the staging dir setup is synchronous.
 

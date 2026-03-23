@@ -1,18 +1,20 @@
 import { writeFileSync, existsSync, unlinkSync } from "node:fs";
-import { join, resolve, relative } from "node:path";
+import { join, relative } from "node:path";
 import { TASKS_DIR, DISCARD_FILE, KEEP_FILE } from "./constants.ts";
 import { yellow } from "./color.ts";
+import { currentTaskRoot } from "./task-root.ts";
 
 export function discard(): void {
-  const cwd = process.cwd();
-  const rel = relative(TASKS_DIR, cwd);
-
-  if (!existsSync(TASKS_DIR) || rel.startsWith("..") || rel === cwd) {
-    console.error("not inside a gtask directory");
+  let taskRoot: string;
+  try {
+    taskRoot = currentTaskRoot();
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
     process.exit(1);
   }
 
-  const taskRoot = join(TASKS_DIR, rel.split("/")[0]);
   const marker = join(taskRoot, DISCARD_FILE);
 
   if (existsSync(marker)) {

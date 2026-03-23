@@ -41,6 +41,41 @@ function withinGertrudeSyncWindow(now: Date): boolean {
   return hour >= 5 && hour < 22;
 }
 
+export function warmupCommands(target: string, ports: TaskPorts): string[] {
+  return [
+    `cd "${join(target, "swift")}"`,
+    `export API_PORT=${ports.api}`,
+    `run just migrate-up`,
+    `run pnpm install`,
+    `run git restore -- pnpm-lock.yaml`,
+    `run just nuke-test-db`,
+    `run just build`,
+    `run just macapp-xcode-build`,
+    `run just iosapp-xcode-build`,
+    `run just test`,
+    `run just lint`,
+    ``,
+    `cd "${join(target, "web")}"`,
+    `run pnpm install`,
+    `run just lint`,
+    `run just format-check`,
+    `run just typecheck`,
+    `run just test`,
+    `run just build-storybook`,
+    `# warm storybook dev cache (start dev server, wait for ready, kill)`,
+    `just storybook >> "$log" 2>&1 &`,
+    `sb_pid=$!`,
+    `for i in $(seq 1 180); do`,
+    `  curl -sf -o /dev/null "http://localhost:${ports.storybook}/" && break`,
+    `  sleep 1`,
+    `done`,
+    `kill $sb_pid 2>/dev/null || true`,
+    `lsof -ti :${ports.storybook} | xargs kill 2>/dev/null || true`,
+    `wait $sb_pid 2>/dev/null || true`,
+    ``,
+  ];
+}
+
 export async function create(slug: string, opts?: { light?: boolean }): Promise<void> {
   const light = opts?.light ?? false;
   const dirName = makeTargetDir(slug);
@@ -100,40 +135,7 @@ export async function create(slug: string, opts?: { light?: boolean }): Promise<
   const envCopyCmds = ENV_TEMPLATES.map(({ dest }) =>
     `run cp "${join(staging, dest)}" "${join(target, dest)}"`
   );
-  const warmupCmds = light
-    ? []
-    : [
-        `cd "${join(target, "swift")}"`,
-        `export API_PORT=${ports.api}`,
-        `run just migrate-up`,
-        `run pnpm install`,
-        `run git restore -- pnpm-lock.yaml`,
-        `run just nuke-test-db`,
-        `run just build`,
-        `run just macapp-xcode-build`,
-        `run just iosapp-xcode-build`,
-        `run just test`,
-        `run just lint`,
-        ``,
-        `cd "${join(target, "web")}"`,
-        `run pnpm install`,
-        `run just lint`,
-        `run just format-check`,
-        `run just typecheck`,
-        `run just test`,
-        `run just build-storybook`,
-        `# warm storybook dev cache (start dev server, wait for ready, kill)`,
-        `just storybook >> "$log" 2>&1 &`,
-        `sb_pid=$!`,
-        `for i in $(seq 1 180); do`,
-        `  curl -sf -o /dev/null "http://localhost:${ports.storybook}/" && break`,
-        `  sleep 1`,
-        `done`,
-        `kill $sb_pid 2>/dev/null || true`,
-        `lsof -ti :${ports.storybook} | xargs kill 2>/dev/null || true`,
-        `wait $sb_pid 2>/dev/null || true`,
-        ``,
-      ];
+  const warmupCmds = light ? [] : warmupCommands(target, ports);
 
   const cmds = [
     `set -e`,

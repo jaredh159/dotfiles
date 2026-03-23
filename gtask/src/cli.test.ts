@@ -29,6 +29,7 @@ describe("parseArgs", () => {
     assert.deepStrictEqual(parseArgs(["--discard"]), { type: "discard" });
     assert.deepStrictEqual(parseArgs(["--keep"]), { type: "keep" });
     assert.deepStrictEqual(parseArgs(["--sync"]), { type: "sync" });
+    assert.deepStrictEqual(parseArgs(["--heavy"]), { type: "heavy" });
   });
 
   it("rejects bare command names", () => {
@@ -81,6 +82,7 @@ describe("usageLines", () => {
       "       gtask --discard",
       "       gtask --keep",
       "       gtask --sync",
+      "       gtask --heavy",
       "",
       "Creates an isolated Gertrude task dir under ~/gertie/tasks/<slug>-<MMDDYY>.",
       "Each task gets its own git branch, databases, env files, and reserved port slot.",
@@ -94,6 +96,7 @@ describe("usageLines", () => {
       "",
       "Other commands:",
       "  gtask --sync         Recreate this task's databases from gertrude_sync, then migrate.",
+      "  gtask --heavy        Run the full warm-up/build/test pass in the current task dir.",
       "  gtask --discard      Mark the current task for cleanup even without a merged PR.",
       "  gtask --keep         Toggle cleanup protection for the current task.",
       "  gtask --clean        Remove merged/discarded task dirs. ⚠ Only Jared should ever run this.",

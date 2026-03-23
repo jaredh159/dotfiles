@@ -3,6 +3,7 @@ import { clean } from "./clean.ts";
 import { discard } from "./discard.ts";
 import { keep } from "./keep.ts";
 import { sync } from "./sync.ts";
+import { heavy } from "./heavy.ts";
 import { parseArgs, usageLines } from "./cli.ts";
 
 function printUsage(): void {
@@ -35,6 +36,8 @@ if (parsed.type === "clean") {
   keep();
 } else if (parsed.type === "sync") {
   sync();
+} else if (parsed.type === "heavy") {
+  heavy();
 } else {
   await create(parsed.slug, { light: parsed.light });
 }
