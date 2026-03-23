@@ -14,6 +14,7 @@ vim.filetype.add({
 })
 
 require("config.options")
+require("config.mru_notifications")
 require("config.basic-keymaps")
 
 -- Highlight when yanking (copying) text

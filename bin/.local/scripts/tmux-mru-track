@@ -4,7 +4,8 @@
 # Updates the MRU session list, unless we're in a cycle operation
 
 MRU_FILE="$HOME/.tmux-mru"
-MAX_SESSIONS=10
+MRU_DROP_FILE="$HOME/.tmux-mru-dropped"
+MAX_SESSIONS=12
 
 current_session=$(tmux display-message -p '#S')
 
@@ -18,6 +19,26 @@ fi
 # Create file if it doesn't exist
 touch "$MRU_FILE"
 
+existing_sessions=()
+while IFS= read -r session; do
+  [[ -n "$session" ]] || continue
+  existing_sessions+=("$session")
+done < "$MRU_FILE"
+
+dropped_session=""
+session_already_tracked=0
+for session in "${existing_sessions[@]}"; do
+  if [[ "$session" == "$current_session" ]]; then
+    session_already_tracked=1
+    break
+  fi
+done
+
+if [[ $session_already_tracked -eq 0 && ${#existing_sessions[@]} -ge $MAX_SESSIONS ]]; then
+  last_index=$((${#existing_sessions[@]} - 1))
+  dropped_session="${existing_sessions[$last_index]}"
+fi
+
 # Read existing entries, filter out current session, prepend it
 {
   echo "$current_session"
@@ -25,3 +46,8 @@ touch "$MRU_FILE"
 } > "$MRU_FILE.tmp"
 
 mv "$MRU_FILE.tmp" "$MRU_FILE"
+
+if [[ -n "$dropped_session" ]]; then
+  dropped_path=$(tmux display-message -p -t "$dropped_session" '#{session_path}' 2>/dev/null)
+  printf '%s\n' "${dropped_path:-$dropped_session}" > "$MRU_DROP_FILE"
+fi
