@@ -3,11 +3,10 @@ set -euo pipefail
 
 export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 
-# Time gating: weekdays 6am-5pm only
-DOW=$(date +%u) # 1=Mon, 7=Sun
+# Time gating: daily 5am-10pm only
 HOUR=$((10#$(date +%H)))
-if [[ $DOW -gt 5 || $HOUR -lt 6 || $HOUR -ge 17 ]]; then
-  echo "Outside sync window (weekdays 6am-5pm), skipping"
+if [[ $HOUR -lt 5 || $HOUR -ge 22 ]]; then
+  echo "Outside sync window (daily 5am-10pm), skipping"
   exit 0
 fi
 

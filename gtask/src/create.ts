@@ -36,6 +36,11 @@ function writeEnvFiles(stagingDir: string, dbName: string, testDbName: string, p
 
 const MIN_DISK_GB = 15;
 
+function withinGertrudeSyncWindow(now: Date): boolean {
+  const hour = now.getHours();
+  return hour >= 5 && hour < 22;
+}
+
 export async function create(slug: string, opts?: { light?: boolean }): Promise<void> {
   const light = opts?.light ?? false;
   const dirName = makeTargetDir(slug);
@@ -55,10 +60,15 @@ export async function create(slug: string, opts?: { light?: boolean }): Promise<
 
   const syncFile = join(homedir(), ".gtask-last-sync");
   try {
-    const age = Date.now() - statSync(syncFile).mtimeMs;
+    const now = new Date();
+    const age = now.getTime() - statSync(syncFile).mtimeMs;
     if (age > 2 * 60 * 60 * 1000) {
       const hrs = (age / 3_600_000).toFixed(1);
-      console.log(`⚠ gertrude_sync is ${hrs}hrs old (launchd sync may not be running)`);
+      if (withinGertrudeSyncWindow(now)) {
+        console.log(`⚠ gertrude_sync is ${hrs}hrs old (launchd sync may not be running)`);
+      } else {
+        console.log(`ℹ gertrude_sync is ${hrs}hrs old (auto-sync resumes daily 5am-10pm)`);
+      }
     }
   } catch {
     console.log(`⚠ gertrude_sync age unknown (~/.gtask-last-sync missing)`);
