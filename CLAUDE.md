@@ -44,6 +44,15 @@ The Makefile runs `stow <package>` for each directory, creating symlinks.
 - `ohmyzsh/.zshrc` - Shell configuration
 - `bin/.local/scripts/` - Custom shell utilities
 
+## Search Notes
+
+This repo contains important content under leading-dot package paths like `claude/` and
+`codex/`, which can make quick searches miss relevant files depending on tool defaults,
+aliases, or the starting directory.
+
+If a search turns up nothing and that seems suspicious, try a second pass with explicit
+paths or shell-builtin-avoiding forms such as `command find ...` or `command rg ...`.
+
 ## gtask
 
 If working on anything related to the `gtask` CLI tool (task creation, cleanup, port/db
