@@ -22,6 +22,18 @@ highest priority first. Optimize for truth and code quality, not winning argumen
 The loop is considered complete once every review item has been either accepted,
 rejected, or escalated for later human input.
 
+## Operating Mode
+
+Run this protocol as an autonomous state machine, not as ordinary chat turn-taking.
+
+- In this protocol, `wait` never means passive idling.
+- `Wait` means: keep a polling loop running, re-check the file every 30 seconds, and
+  take the next protocol-mandated action without user prompting.
+- Do not stop after writing a reviewer message and reporting that you are waiting.
+- Do not rely on the user to remind you to check the file.
+- Once the loop starts, you own cadence and progression until the loop is complete or an
+  item is escalated for human input.
+
 ## Shared file protocol
 
 Use one shared append-only text file at the root of the working directory. The file name
@@ -50,6 +62,18 @@ Protocol rules:
 - Treat a message as incomplete until `<<<EOT>>>` appears.
 - Only one side speaks at a time. Wait for the implementing agent’s completed message
   before replying.
+- After appending any complete reviewer message, immediately start or resume a persistent
+  polling loop before doing anything else.
+- Default polling pattern:
+
+```text
+while true; do
+  sleep 30
+  tail -n 20 ./claude.report.external-review.md
+done
+```
+
+- Use a persistent shell session for this poller when possible.
 - After appending a complete message, wait for the implementing agent’s next complete
   message before writing again. While waiting, poll `./claude.report.external-review.md`
   about every 30 seconds. Do not respond to partial messages.
@@ -75,6 +99,39 @@ Allowed states:
 - `ESCALATED`
 - `FINAL`
 
+## Required State Check
+
+Immediately after each append, and immediately after each newly detected complete message,
+re-evaluate all of the following:
+
+- current active item id
+- last role that wrote
+- last state seen
+- whether the latest message is complete
+- what the next mandatory action is
+- whether the poller is currently running
+
+If any of those are unclear, resolve that uncertainty before continuing.
+
+## Turn Table
+
+- After reviewer `OPEN`: poll until the implementer appends a complete reply.
+- After implementer `QUESTION`: reply with clarification, narrowing, rejection, or
+  escalation.
+- After implementer `PROPOSED_FIX`: reply with approval, redirection, rejection, or
+  escalation.
+- After implementer `CHANGES_MADE`: verify the claim immediately, then append
+  `ACCEPTED`, follow-up `QUESTION`, or `ESCALATED`.
+- After reviewer `ACCEPTED` on a non-final item: resume polling and wait for the
+  implementer’s acknowledgment, then open the next item.
+- After reviewer `ACCEPTED` on the last remaining item: request implementer `FINAL`,
+  resume polling immediately, and then append reviewer `FINAL` after implementer
+  `FINAL`.
+- After reviewer `ESCALATED`: resume polling for the implementer’s acknowledgment, then
+  proceed to the next remaining item.
+- After implementer `FINAL`: append reviewer `FINAL` immediately. The reviewer always
+  takes the last turn.
+
 ## Workflow
 
 1. Append a short intro message identifying yourself as the reviewer and stating that you
@@ -89,7 +146,7 @@ Allowed states:
    - focus on the problem, impact, and resolution target; do not prescribe exact code
    changes unless implementation details are necessary to explain the concern or the
    implementer specifically asks for that level of guidance.
-4. Stop and wait for the implementer’s response.
+4. Immediately start or resume the poller and enter monitoring mode.
 5. If the implementer pushes back, engage seriously. Narrow, refine, or withdraw the
    finding if warranted.
    The implementer may ask for escalation, but you decide whether to mark the item
@@ -105,7 +162,10 @@ Allowed states:
 9. If the item cannot be resolved without human input, append an `ESCALATED` message with
    a concise summary of the disagreement and the decision needed, then move on.
 10. Then move to the next highest-priority remaining finding.
-11. When all remaining findings are handled, append a `FINAL` message containing:
+11. When there are no remaining non-escalated items, append a short reviewer message on
+    `ITEM: final` asking the implementer to append their `FINAL`, then immediately
+    resume polling.
+12. After the implementer appends `FINAL`, append a reviewer `FINAL` message containing:
     - count of findings resolved
     - count of findings dropped after discussion
     - count of findings escalated for human input
@@ -132,6 +192,8 @@ Allowed states:
   commits yet.
 - If a disagreement stalls, summarize it clearly, mark it `ESCALATED`, and continue with
   the remaining items instead of blocking the whole review.
+- If the user has to remind you to keep checking the file, you are already off-protocol.
+- Prefer one persistent poller over repeated one-off file reads while waiting.
 
 ## Message templates
 
@@ -179,6 +241,14 @@ Proceed to the next remaining item.
 >>> ROLE: reviewer | ITEM: R1 | STATE: ESCALATED
 We have reached a hard disagreement on this item and need human input before deciding how to proceed. Summary of disagreement: <brief summary>. Human decision needed: <brief decision>.
 Proceeding to the next remaining item while this stays open for escalation.
+<<<EOT>>>
+```
+
+### Requesting Final
+
+```text
+>>> ROLE: reviewer | ITEM: final | STATE: QUESTION
+I have no more remaining findings to send. Please append your FINAL message and I will close the loop with the reviewer FINAL after that.
 <<<EOT>>>
 ```
 

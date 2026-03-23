@@ -26,6 +26,17 @@ bringing a fresh set of eyes.
 The loop is considered complete once every review item has been either accepted,
 rejected, or escalated for later human input.
 
+## Operating Mode
+
+Run this protocol as an autonomous state machine, not as ordinary chat turn-taking.
+
+- In this protocol, `wait` never means passive idling.
+- `Wait` means: keep a polling loop running, re-check the file every 30 seconds, and
+  take the next protocol-mandated action without user prompting.
+- Do not stop after writing an implementer message and reporting that you are waiting.
+- Once the loop starts, you own your side of the cadence until the loop is complete or
+  an item is escalated for human input.
+
 ## Shared file protocol
 
 Use one shared append-only text file at the root of the working directory. The file name
@@ -54,6 +65,18 @@ Protocol rules:
 - Treat a message as incomplete until `<<<EOT>>>` appears.
 - Only one side speaks at a time. Wait for the reviewer’s completed message before
   replying.
+- After appending any complete implementer message, immediately start or resume a
+  persistent polling loop before doing anything else.
+- Default polling pattern:
+
+```text
+while true; do
+  sleep 30
+  tail -n 20 ./claude.report.external-review.md
+done
+```
+
+- Use a persistent shell session for this poller when possible.
 - After appending a complete message, wait for the reviewer’s next complete message
   before writing again. While waiting, poll `./claude.report.external-review.md` about
   every 30 seconds. Do not respond to partial messages.
@@ -76,6 +99,33 @@ Allowed states:
 - `ACCEPTED`
 - `REJECTED`
 - `FINAL`
+
+## Required State Check
+
+Immediately after each append, and immediately after each newly detected complete message,
+re-evaluate all of the following:
+
+- current active item id
+- last role that wrote
+- last state seen
+- whether the latest message is complete
+- what the next mandatory action is
+- whether the poller is currently running
+
+If any of those are unclear, resolve that uncertainty before continuing.
+
+## Turn Table
+
+- After reviewer `OPEN`: reply on that item with `QUESTION` or `PROPOSED_FIX`.
+- After reviewer follow-up `QUESTION`: answer that question directly on the same item.
+- After reviewer acceptance conditions are clear: implement, validate, and append
+  `CHANGES_MADE`.
+- After reviewer `ACCEPTED`: append a brief acknowledgment so the handoff is explicit,
+  then resume polling for the next item.
+- After reviewer `ESCALATED`: treat that item as deferred and resume polling for the next
+  reviewer-selected item.
+- After reviewer `QUESTION` on `ITEM: final`: append implementer `FINAL`, then resume
+  polling for the reviewer’s closing `FINAL`.
 
 ## Workflow
 
@@ -104,11 +154,17 @@ WIP:
 ```
 
 9. Include the commit hash in the same or next message.
-10. Wait for reviewer acceptance. Do not begin another item early.
-11. If the reviewer marks an item `ESCALATED`, treat it as deferred for human input and
+10. When the reviewer marks an item `ACCEPTED`, immediately append a brief acknowledgment
+    turn (e.g. "R1 closed on my end. Ready for the next item.") to hand control back
+    explicitly. Do not sit idle assuming the reviewer will spontaneously open the next
+    item — an imperative like "proceed to the next item" in an ACCEPTED message is
+    directed at you, not self-directed. The explicit acknowledgment makes the handoff
+    unambiguous.
+11. Wait for reviewer acceptance. Do not begin another item early.
+12. If the reviewer marks an item `ESCALATED`, treat it as deferred for human input and
     wait for the next reviewer-selected item.
-12. Repeat until there are no remaining items.
-13. When the reviewer is done sending items, append a `FINAL` message confirming
+13. Repeat until there are no remaining items.
+14. When the reviewer is done sending items, append a `FINAL` message confirming
     implementation work is complete for now and any escalated items are pending human
     input, then wait for the reviewer’s final summary.
 
@@ -127,6 +183,7 @@ WIP:
 - Once agreement is reached, implement decisively.
 - Keep messages concise and operational.
 - Never rewrite or truncate the shared file.
+- Prefer one persistent poller over repeated one-off file reads while waiting.
 
 ## Message templates
 
