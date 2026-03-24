@@ -21,4 +21,11 @@ share-commands: ## Symlink Claude commands into OpenCode
 	done
 	@echo "Linked $$(ls ~/.config/opencode/commands/*.md 2>/dev/null | wc -l | tr -d ' ') commands to OpenCode"
 
-.PHONY: stow share-commands
+pfw-sync:
+	./claude/.claude/skills/point-free/scripts/sync-upstream-skills.sh
+
+pfw-refresh:
+	pfw install --tool codex
+	./claude/.claude/skills/point-free/scripts/sync-upstream-skills.sh
+
+.PHONY: stow share-commands pfw-sync pfw-refresh

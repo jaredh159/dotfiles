@@ -7,3 +7,6 @@ nvim/.config/nvim/plugin/packer_compiled.lua
 secrets.local
 zsh.local
 dictator/.config/dictator/dictator.secrets.toml
+claude/.claude/skills/point-free/references/upstream/*
+!claude/.claude/skills/point-free/references/upstream/.gitignore
+codex/.codex/skills/point-free

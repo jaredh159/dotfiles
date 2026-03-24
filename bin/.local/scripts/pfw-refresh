@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:$PATH"
+
+# Time gating: daily 5am-10pm only
+HOUR=$((10#$(date +%H)))
+if [[ $HOUR -lt 5 || $HOUR -ge 22 ]]; then
+  echo "Outside sync window (daily 5am-10pm), skipping"
+  exit 0
+fi
+
+REPO_ROOT="$HOME/.dotfiles"
+RUN_LOCK_DIR="/tmp/pfw-refresh.lock"
+
+if [[ ! -d "$REPO_ROOT/.git" ]]; then
+  echo "ERROR: $REPO_ROOT is not a git repository"
+  osascript -e 'display notification ".dotfiles repo missing or invalid" with title "pfw-refresh"'
+  exit 1
+fi
+
+if ! command -v pfw >/dev/null 2>&1; then
+  echo "ERROR: pfw is not installed"
+  osascript -e 'display notification "pfw binary not found" with title "pfw-refresh"'
+  exit 1
+fi
+
+if ! mkdir "$RUN_LOCK_DIR" 2>/dev/null; then
+  echo "$(date): Another pfw refresh is already running, skipping"
+  exit 0
+fi
+trap 'rmdir "$RUN_LOCK_DIR"' EXIT
+
+cd "$REPO_ROOT"
+
+echo "$(date): Refreshing upstream Point-Free skills"
+pfw install --tool codex
+
+echo "$(date): Rebuilding local point-free meta-skill"
+/usr/bin/make -C "$REPO_ROOT" pfw-sync
+
+echo "$(date): Point-Free refresh complete"
