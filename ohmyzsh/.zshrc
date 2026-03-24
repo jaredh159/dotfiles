@@ -62,7 +62,7 @@ vims() {
   else
     local startup_file=""
 
-    for candidate in README.md README readme.md readme; do
+    for candidate in task.scratch.md README.md README readme.md readme; do
       if [ -f "$candidate" ]; then
         startup_file="$candidate"
         break
@@ -70,7 +70,7 @@ vims() {
     done
 
     if [ -z "$startup_file" ]; then
-      startup_file=$(find . -maxdepth 1 -type f ! -name "Session.vim" ! -name ".DS_Store" -print | sed 's#^\./##' | sort | head -n 1)
+      startup_file=$(find . -maxdepth 1 -type f ! -name "Session.vim" ! -name ".DS_Store" ! -name "task.scratch.md" -print | sed 's#^\./##' | sort | head -n 1)
     fi
 
     if [ -n "$startup_file" ]; then

@@ -4,6 +4,7 @@ import {
   parseBranchFromDir,
   makeDatestamp,
   makeTargetDir,
+  humanizeSlug,
   dbNameFromDir,
 } from "./parse.ts";
 
@@ -62,6 +63,16 @@ describe("makeTargetDir", () => {
   it("combines slug with datestamp", () => {
     const result = makeTargetDir("my-feature");
     assert.match(result, /^my-feature-\d{6}$/);
+  });
+});
+
+describe("humanizeSlug", () => {
+  it("turns hyphenated slugs into title case words", () => {
+    assert.strictEqual(humanizeSlug("fix-login"), "Fix Login");
+  });
+
+  it("collapses repeated separators", () => {
+    assert.strictEqual(humanizeSlug("fix--ios_log-search"), "Fix Ios Log Search");
   });
 });
 

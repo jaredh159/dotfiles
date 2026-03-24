@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, writeFileSync, statSync, statfsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { homedir, tmpdir } from "node:os";
-import { makeTargetDir, dbNameFromDir } from "./parse.ts";
+import { makeTargetDir, dbNameFromDir, humanizeSlug } from "./parse.ts";
 import { background } from "./exec.ts";
 import { loadTemplate, resolveTemplate, buildTemplateVars } from "./template.ts";
 import { allocateSlot, portsForSlot, portsFileContent } from "./slot.ts";
@@ -76,6 +76,10 @@ export function warmupCommands(target: string, ports: TaskPorts): string[] {
   ];
 }
 
+function makeScratchFile(slug: string): string {
+  return `# 👋 ${humanizeSlug(slug)}\n`;
+}
+
 export async function create(slug: string, opts?: { light?: boolean }): Promise<void> {
   const light = opts?.light ?? false;
   const dirName = makeTargetDir(slug);
@@ -123,6 +127,7 @@ export async function create(slug: string, opts?: { light?: boolean }): Promise<
   // `allocateSlot()` calls see this slot as occupied
   mkdirSync(target, { recursive: true });
   writeFileSync(join(target, SLOT_FILE), String(slot) + "\n");
+  writeFileSync(join(target, "task.scratch.md"), makeScratchFile(slug));
   writeFileSync(
     join(target, PORTS_FILE),
     portsFileContent(ports, { ngrokSubdomain })
