@@ -74,7 +74,7 @@ vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer.sh<CR>", {
 -- show tmux MRU stack in telescope, select to switch
 vim.keymap.set("n", "<leader>mm", function()
   local tmux_projects = require("config.tmux_projects")
-  local sessions = tmux_projects.read_mru_sessions()
+  local sessions = tmux_projects.read_resolved_mru_sessions()
   if #sessions == 0 then
     vim.notify("MRU stack is empty", vim.log.levels.WARN)
     return
@@ -85,9 +85,11 @@ vim.keymap.set("n", "<leader>mm", function()
   local actions = require("telescope.actions")
   local action_state = require("telescope.actions.state")
   local results = vim.tbl_map(function(session)
+    local path = tmux_projects.resolved_path_for_session(session)
     return {
       session = session,
-      display = tmux_projects.display_name_for_path(tmux_projects.path_for_session(session)),
+      path = path,
+      display = tmux_projects.display_name_for_path(path),
     }
   end, sessions)
   pickers
@@ -109,7 +111,15 @@ vim.keymap.set("n", "<leader>mm", function()
           local selection = action_state.get_selected_entry()
           actions.close(prompt_bufnr)
           if selection then
-            vim.fn.system("tmux switch-client -t " .. vim.fn.shellescape(selection.value.session))
+            local session = selection.value.session
+            local path = selection.value.path
+            vim.fn.system(string.format(
+              'tmux has-session -t "%s" 2>/dev/null || tmux new-session -s "%s" -c "%s" -d',
+              session,
+              session,
+              path
+            ))
+            vim.fn.system("tmux switch-client -t " .. vim.fn.shellescape(session))
           end
         end)
         return true
