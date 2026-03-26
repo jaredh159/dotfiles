@@ -3,20 +3,25 @@ description: Load and view photos airdropped from iPhone
 ---
 
 Jared is about to start sending photos from his iPhone via AirDrop. These arrive as
-`.HEIC` files in `~/Downloads`.
+`.HEIC` files (photos) or `.PNG` files (screenshots) in `~/Downloads`.
 
 ## Steps
 
-### 1. Find the newest HEIC files
+### 1. Find the most recently added image files
+
+AirDropped files preserve their original creation/modification dates, so sorting by
+modification time will NOT find recently AirDropped files. Instead, use macOS Spotlight
+metadata (`kMDItemDateAdded`) which tracks when the file was added to the folder:
 
 ```bash
-ls -lt ~/Downloads/*.HEIC ~/Downloads/*.heic 2>/dev/null | head -10
+for f in ~/Downloads/*.HEIC ~/Downloads/*.heic ~/Downloads/*.PNG ~/Downloads/*.png; do
+  [ -f "$f" ] && echo "$(mdls -name kMDItemDateAdded -raw "$f") $f"
+done 2>/dev/null | sort -r | head -10
 ```
 
-Ask the user how many recent photos to look at if not specified. There might be a bunch,
-the ones you want are probably the most recent, from today's date..
+Ask the user how many recent photos to look at if not specified.
 
-### 2. Convert to JPEG for viewing
+### 2. Convert for viewing
 
 HEIC files are too large to read directly. Convert with `sips`:
 
@@ -26,12 +31,18 @@ sips -s format jpeg ~/Downloads/IMG_XXXX.HEIC --out /tmp/IMG_XXXX.jpg -Z 2048
 
 `-Z 2048` constrains the longest edge to 2048px, keeping file size manageable.
 
+PNG screenshots can usually be read directly, but if they're large, downsize with:
+
+```bash
+sips -Z 2048 ~/Downloads/IMG_XXXX.PNG --out /tmp/IMG_XXXX.png
+```
+
 ### 3. View with the Read tool
 
-Use the Read tool on the converted `/tmp/*.jpg` files. Read supports images natively.
+Use the Read tool on the converted `/tmp/` files. Read supports images natively.
 
 ### Notes
 
 - Convert and read multiple images in parallel when possible.
-- HEIC files are sorted by modification time; newest first.
+- Files are sorted by Finder "date added" (kMDItemDateAdded); newest first.
 - Converted files go in `/tmp` to avoid cluttering Downloads.
