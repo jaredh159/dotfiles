@@ -34,6 +34,30 @@ Run this protocol as an autonomous state machine, not as ordinary chat turn-taki
 - Once the loop starts, you own cadence and progression until the loop is complete or an
   item is escalated for human input.
 
+## Codex Runtime Requirements
+
+This protocol is only valid if you keep the entire loop inside a single still-open Codex
+turn.
+
+- Do **not** emit a normal completion or `final_answer` after opening the loop.
+- Once the loop has started, the task is not complete until you have appended the
+  reviewer `FINAL` message yourself.
+- Treat any urge to summarize status to the human as a trap unless the protocol is fully
+  complete or you are blocked by a genuine human-only decision.
+- If you append a reviewer message and then end the turn before the next required
+  protocol step, you have failed the protocol.
+- `Wait` must be implemented with an actually running poller session, not with the idea
+  of checking again later.
+- Prefer a single long-lived PTY session started with the terminal tool and kept alive
+  for the duration of the loop.
+- Prefer `write_stdin` against the same session to continue polling rather than starting
+  fresh one-off reads.
+- One-off `tail`/`sed`/`cat` checks while waiting are non-compliant except for initial
+  setup, recovery after tool failure, or immediate verification work after
+  `CHANGES_MADE`.
+- If the user has to say "check again", "keep going", or anything similar, you were
+  off-protocol already.
+
 ## Shared file protocol
 
 Use one shared append-only text file at the root of the working directory. The file name
@@ -113,6 +137,12 @@ re-evaluate all of the following:
 
 If any of those are unclear, resolve that uncertainty before continuing.
 
+Also re-evaluate:
+
+- whether you are still inside the same active Codex turn
+- whether you have accidentally emitted anything that could cause task completion
+- whether your live poller session still exists and is still the one you intend to use
+
 ## Turn Table
 
 - After reviewer `OPEN`: poll until the implementer appends a complete reply.
@@ -124,7 +154,8 @@ If any of those are unclear, resolve that uncertainty before continuing.
   `ACCEPTED`, follow-up `QUESTION`, or `ESCALATED`.
 - After reviewer `ACCEPTED` on a non-final item: resume polling and wait for the
   implementer’s acknowledgment, then open the next item.
-- After reviewer `ACCEPTED` on the last remaining item: request implementer `FINAL`,
+- After reviewer `ACCEPTED` on the last remaining item: request implementer `FINAL` with
+  reviewer `ITEM: final | STATE: QUESTION`,
   resume polling immediately, and then append reviewer `FINAL` after implementer
   `FINAL`.
 - After reviewer `ESCALATED`: resume polling for the implementer’s acknowledgment, then
@@ -147,6 +178,8 @@ If any of those are unclear, resolve that uncertainty before continuing.
    changes unless implementation details are necessary to explain the concern or the
    implementer specifically asks for that level of guidance.
 4. Immediately start or resume the poller and enter monitoring mode.
+   For Codex, this means creating or resuming one persistent PTY-backed shell session
+   and keeping it alive for the rest of the loop.
 5. If the implementer pushes back, engage seriously. Narrow, refine, or withdraw the
    finding if warranted.
    The implementer may ask for escalation, but you decide whether to mark the item
@@ -163,7 +196,7 @@ If any of those are unclear, resolve that uncertainty before continuing.
    a concise summary of the disagreement and the decision needed, then move on.
 10. Then move to the next highest-priority remaining finding.
 11. When there are no remaining non-escalated items, append a short reviewer message on
-    `ITEM: final` asking the implementer to append their `FINAL`, then immediately
+    `ITEM: final | STATE: QUESTION` asking the implementer to append their `FINAL`, then immediately
     resume polling.
 12. After the implementer appends `FINAL`, append a reviewer `FINAL` message containing:
     - count of findings resolved
@@ -194,6 +227,23 @@ If any of those are unclear, resolve that uncertainty before continuing.
   the remaining items instead of blocking the whole review.
 - If the user has to remind you to keep checking the file, you are already off-protocol.
 - Prefer one persistent poller over repeated one-off file reads while waiting.
+- Do not emit `final_answer` until after the reviewer `FINAL` message has been appended.
+- While the loop is active, commentary updates are allowed, but they must not imply the
+  work is complete.
+- If you need to verify code after `CHANGES_MADE`, do that verification immediately, then
+  return to the same poller session.
+
+## Codex Execution Sketch
+
+Use this shape unless the environment makes it impossible:
+
+1. Read the shared file and determine current state.
+2. Append the next required reviewer message, if any.
+3. Start or resume one persistent PTY poller session.
+4. Keep the task alive by polling that session roughly every 30 seconds.
+5. When a new complete implementer message appears, take the protocol-mandated action.
+6. Repeat until reviewer `FINAL` is appended.
+7. Only then send the human-facing final completion message.
 
 ## Message templates
 
