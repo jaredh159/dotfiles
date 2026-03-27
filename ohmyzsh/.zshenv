@@ -31,6 +31,9 @@ export TASK_MEGA_YIELD_COUNT=100
 # export CLAUDE_CODE_DISABLE_AUTO_UPDATE=1
 # export DISABLE_AUTOUPDATER=1
 
+# disable auto 1m context window
+export CLAUDE_CODE_DISABLE_1M_CONTEXT=1
+
 # clear out the path, start brand new
 PATH=""
 
