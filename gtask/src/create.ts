@@ -50,7 +50,7 @@ export function warmupCommands(target: string, ports: TaskPorts): string[] {
     `run git restore -- pnpm-lock.yaml`,
     `run just nuke-test-db`,
     `run just build`,
-    `run just macapp-xcode-build`,
+    `run just macapp xcode-build`,
     `run just iosapp-xcode-build`,
     `run just test`,
     `run just lint`,
