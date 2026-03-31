@@ -52,20 +52,35 @@ vim.keymap.set(
 )
 vim.keymap.set("n", "<leader>ff", "<cmd>Telescope live_grep<CR>", { desc = "Live grep search" })
 vim.keymap.set("n", "<leader>hh", function()
-  require("telescope.builtin").find_files({
+  local builtin = require("telescope.builtin")
+  local cwd = vim.uv.cwd()
+  local find_command = {
+    "rg",
+    "--files",
+    "--hidden",
+    "-g", "**/claude.task.md",
+    "-g", "**/claude.ledger.*.md",
+    "-g", "**/claude.report.*.md",
+    "-g", "**/task.scratch.md",
+    "-g", "**/.env*",
+    "-g", "**/Local.xcconfig",
+  }
+  local opts = {
     prompt_title = "Hidden Project Files",
-    find_command = {
-      "rg",
-      "--files",
-      "--hidden",
-      "-g", "**/claude.task.md",
-      "-g", "**/claude.ledger.*.md",
-      "-g", "**/claude.report.*.md",
-      "-g", "**/task.scratch.md",
-      "-g", "**/.env*",
-      "-g", "**/Local.xcconfig",
-    },
-  })
+    find_command = find_command,
+  }
+
+  if cwd and vim.uv.fs_stat(cwd .. "/task.scratch.md") then
+    local results = vim.fn.systemlist(find_command)
+    for i, path in ipairs(results) do
+      if path == "task.scratch.md" then
+        opts.default_selection_index = i
+        break
+      end
+    end
+  end
+
+  builtin.find_files(opts)
 end, { desc = "Find hidden project files (env, claude.*)" })
 
 -- tmux sessionizer
