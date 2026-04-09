@@ -67,7 +67,9 @@ gtask also writes `NGROK_SUBDOMAIN=...` into `.gtask-ports`.
 Templates live in `gtask/env/` with `{{PLACEHOLDER}}` syntax. Secrets come from `GTASK_*`
 env vars defined in `secrets.local` (sourced in `.zshrc`). Task-specific values
 (`TASK_DATABASE_NAME`, `TASK_API_PORT`, etc.) are injected at creation time. This
-includes `GTASK_NGROK_SUBDOMAIN` for local iOS/ngrok configuration.
+includes `GTASK_NGROK_SUBDOMAIN` for local iOS/ngrok configuration and any service
+credentials that need to become non-`GTASK_` runtime env vars in generated task files
+such as `KEYCHAIN_CRAWLER_URL` and `KEYCHAIN_CRAWLER_AUTH_TOKEN`.
 
 ## Source files
 

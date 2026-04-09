@@ -97,4 +97,23 @@ describe("buildTemplateVars", () => {
     );
     delete process.env.GTASK_NGROK_SUBDOMAIN;
   });
+
+  it("includes additional GTASK secrets for env templates", () => {
+    process.env.GTASK_KEYCHAIN_CRAWLER_URL = "https://example.com/analyze";
+    process.env.GTASK_KEYCHAIN_CRAWLER_AUTH_TOKEN = "secret-token";
+
+    const vars = buildTemplateVars({});
+
+    assert.strictEqual(
+      vars.GTASK_KEYCHAIN_CRAWLER_URL,
+      "https://example.com/analyze"
+    );
+    assert.strictEqual(
+      vars.GTASK_KEYCHAIN_CRAWLER_AUTH_TOKEN,
+      "secret-token"
+    );
+
+    delete process.env.GTASK_KEYCHAIN_CRAWLER_URL;
+    delete process.env.GTASK_KEYCHAIN_CRAWLER_AUTH_TOKEN;
+  });
 });
