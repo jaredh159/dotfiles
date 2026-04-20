@@ -17,11 +17,28 @@ export function execSafe(cmd: string, opts?: { cwd?: string }): string {
   }
 }
 
+export function withXcrunSwiftFirst(cmds: string[]): string {
+  return [
+    `if command -v xcrun >/dev/null 2>&1; then`,
+    `  swift_path="$(xcrun --find swift 2>/dev/null || true)"`,
+    `  if [ -n "$swift_path" ]; then`,
+    `    swift_bin="$(dirname "$swift_path")"`,
+    `    case ":$PATH:" in`,
+    `      *":$swift_bin:"*) ;;`,
+    `      *) export PATH="$swift_bin:$PATH" ;;`,
+    `    esac`,
+    `  fi`,
+    `fi`,
+    ``,
+    ...cmds,
+  ].join("\n");
+}
+
 export function background(
   cmds: string[],
   opts: { cwd: string; logFile: string }
 ): void {
-  const script = cmds.join("\n");
+  const script = withXcrunSwiftFirst(cmds);
   const logFd = openSync(opts.logFile, "a");
   const child = spawn("bash", ["-c", script], {
     cwd: opts.cwd,
