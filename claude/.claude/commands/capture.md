@@ -2,28 +2,29 @@
 description: Capture current context for resumption
 ---
 
-Capture only the context that materially helps the next session resume work.
+Capture the context that materially helps the next session resume work.
 
-Default to updating or consolidating the current resume context, not appending endlessly.
+Default to updating or consolidating the current resume context when that keeps the resume
+path easier to read.
 
 ## Core goals
 
-- Preserve the shortest possible high-value resume context
+- Preserve concise, high-value resume context
 - Prefer durable decisions, current state, remaining work, blockers, and open questions
-- Exclude implementation residue that will not matter next session
-- Keep the task file's resume list minimal so future agents do not reread stale context
+- Skip implementation residue that is unlikely to matter next session
+- Keep the task file's resume list focused so future agents do not reread stale context
 
-## Hard constraints
+## Size and reuse guidelines
 
-- Target **60-100 lines**.
-- Stay under **120 lines** unless the task is unusually complex.
+- Aim for **60-120 lines**.
+- It is fine to go longer when the task is unusually complex or nuance would be lost.
 - Prefer **updating the latest ledger** when it already covers the same workstream and can
-  remain within the line budget after pruning.
-- Create a **new** ledger only when there is a real phase boundary, topic shift, or the
-  current ledger would become unwieldy.
-- If there are already many ledgers, prefer creating a **consolidated ledger** that
-  supersedes older ones, then trim the resume list in `claude.task.md` to only the few
-  files still worth reading.
+  stay readable after pruning.
+- Create a **new** ledger when there is a real phase boundary, topic shift, or the current
+  ledger would become unwieldy.
+- If there are already many ledgers, consider creating a **consolidated ledger** that
+  supersedes older ones, then trim the resume list in `claude.task.md` to the files still
+  worth reading.
 
 ## What to include
 
@@ -33,9 +34,9 @@ Default to updating or consolidating the current resume context, not appending e
 - Durable architecture / product / workflow decisions
 - Important gotchas that are likely to bite a future session again
 - Open questions, unresolved tradeoffs, and explicitly deferred work
-- Blocking failures **only if** they are still unresolved or changed the plan
+- Blocking failures that are still unresolved or changed the plan
 
-## What to omit unless truly essential
+## What to omit or summarize unless essential
 
 - Exact test counts, "all tests pass", lint/typecheck summaries, or routine validation
 - Temporary tool noise: SourceKit glitches, stale build errors, linter churn, formatter edits
@@ -46,20 +47,21 @@ Default to updating or consolidating the current resume context, not appending e
 - Storybook scaffolding details unless storybook itself is the deliverable
 - Background-task / async / helper extraction details unless they affect future work
 - File-by-file inventories when a compact grouped summary is enough
-- Low-value "nothing in progress" sections that add no information
+- Low-value "nothing in progress" sections that add little information
 
-## Compression rules
+## Token efficiency rules
 
 - Write for the next agent who needs to act, not for audit history.
-- Summarize end state over chronology.
-- Collapse repeated implementation patterns into one reusable note.
-- Mention tests only when:
+- Usually summarize end state over chronology.
+- Collapse repeated implementation patterns into one reusable note when it preserves the
+  useful signal.
+- Mention tests when they affect resume behavior, such as:
   - a failure is still blocking
   - a missing test is important
   - a specific regression risk should be rechecked
-- Mention commands/tooling only when a future session truly needs them.
+- Mention commands/tooling when a future session would benefit from knowing them.
 - Prefer a few grouped bullets over long sub-bullets and exhaustive file lists.
-- If older ledgers are fully superseded, say so plainly in the new consolidated ledger.
+- If older ledgers are fully superseded, say so plainly in the consolidated ledger.
 
 ## Ledger decision heuristic
 
@@ -74,14 +76,14 @@ Good fit:
 
 - Same workstream, goals, and general direction
 - New information mostly changes current state, remaining work, blockers, or a few decisions
-- The revised ledger will still fit within the line budget
-- A future agent could safely read only the updated latest ledger and not miss anything
+- The revised ledger will still fit within the recommended size
+- A future agent could safely treat the updated latest ledger as the primary resume document
 
-Default to this option when in doubt.
+Prefer this option when it remains a good resume document.
 
 ### Append a new ledger
 
-Use this only when there is a real boundary that deserves its own resumable chunk.
+Use this when there is a real boundary that deserves its own resumable chunk.
 
 Good fit:
 
@@ -90,7 +92,7 @@ Good fit:
 - The previous ledger remains a useful closed snapshot
 - Folding the new session into the prior ledger would make it too long or muddy
 
-Do **not** append just because another session happened.
+Avoid appending just because another session happened.
 
 ### Consolidate
 
@@ -107,15 +109,15 @@ When consolidating:
 
 - Write one ledger that captures the current truth
 - Explicitly note which older ledgers it supersedes for resume purposes
-- Prune `claude.task.md` so only the still-useful files remain in the resume list
+- Update `claude.task.md` so the resume list points to the files still worth reading
 
 ### Thresholds
 
 - `0-2` active ledgers: usually fine
 - `3` active ledgers: acceptable only if each has clearly distinct scope
-- `4+` active ledgers: strongly prefer consolidation
-- If the latest ledger would exceed the line budget after cleanup, either split at a real
-  phase boundary or consolidate
+- `4+` active ledgers: consider consolidation
+- If the latest ledger would become hard to scan after cleanup, either split at a real phase
+  boundary or consolidate
 
 ## Steps
 
@@ -140,7 +142,7 @@ When consolidating:
 
 ## Completed
 
-- Durable progress only. Group related changes.
+- Durable progress. Group related changes.
 
 ## Current State
 
@@ -177,12 +179,12 @@ Notes:
   Read these files sequentially to resume:
 
   - `./claude.ledger.N.md` — 1-line reason this file is still worth reading
-  - `./claude.ledger.M.md` — only if still independently valuable
+  - `./claude.ledger.M.md` — when still independently valuable
   ```
 
-- Keep this list **minimal**. Do **not** link every historical ledger by default.
+- Keep this list **focused**. Do not link every historical ledger by default.
 - Remove older ledgers from the resume list when a newer ledger clearly supersedes them.
-- Older ledgers may stay on disk, but only currently useful ones should remain in the task
+- Older ledgers may stay on disk, but currently useful ones should remain in the task
   file's resume sequence.
 - After reading them, tell the user which files (including the claude.task.md file) that
   you read to resume context.

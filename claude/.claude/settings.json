@@ -12,5 +12,6 @@
     "swift-lsp@claude-plugins-official": true
   },
   "skipDangerousModePermissionPrompt": true,
-  "gitAttribution": false
+  "gitAttribution": false,
+  "agentPushNotifEnabled": true
 }
