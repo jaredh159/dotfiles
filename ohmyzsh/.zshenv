@@ -73,3 +73,6 @@ export PATH
 
 # haskell
 [ -f "/Users/jared/.ghcup/env" ] && . "/Users/jared/.ghcup/env"
+
+# swiftly
+[ -f "/Users/jared/.swiftly/env.sh" ] && . "/Users/jared/.swiftly/env.sh"
