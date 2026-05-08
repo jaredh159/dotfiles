@@ -58,9 +58,9 @@ vim.keymap.set("n", "<leader>hh", function()
     "rg",
     "--files",
     "--hidden",
-    "-g", "**/claude.task.md",
-    "-g", "**/claude.ledger.*.md",
-    "-g", "**/claude.report.*.md",
+    "-g", "**/agent.task.md",
+    "-g", "**/agent.ledger.*.md",
+    "-g", "**/agent.report.*.md",
     "-g", "**/task.scratch.md",
     "-g", "**/.env*",
     "-g", "**/Local.xcconfig",
@@ -81,7 +81,7 @@ vim.keymap.set("n", "<leader>hh", function()
   end
 
   builtin.find_files(opts)
-end, { desc = "Find hidden project files (env, claude.*)" })
+end, { desc = "Find hidden project files (env, agent.*)" })
 
 -- tmux sessionizer
 vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer.sh<CR>", { desc = "Open tmux sessionizer" })
