@@ -23,7 +23,7 @@ path easier to read.
 - Create a **new** ledger when there is a real phase boundary, topic shift, or the current
   ledger would become unwieldy.
 - If there are already many ledgers, consider creating a **consolidated ledger** that
-  supersedes older ones, then trim the resume list in `claude.task.md` to the files still
+  supersedes older ones, then trim the resume list in `agent.task.md` to the files still
   worth reading.
 
 ## What to include
@@ -39,7 +39,8 @@ path easier to read.
 ## What to omit or summarize unless essential
 
 - Exact test counts, "all tests pass", lint/typecheck summaries, or routine validation
-- Temporary tool noise: SourceKit glitches, stale build errors, linter churn, formatter edits
+- Temporary tool noise: SourceKit glitches, stale build errors, linter churn, formatter
+  edits
 - Exact short IDs, log IDs, Slack tags, event IDs, request IDs, or `sid --llm` output
 - Step-by-step implementation history when the end state can be summarized directly
 - Micro-iterations of copy/layout/styling unless they encode a durable user preference
@@ -75,9 +76,11 @@ still serve as the single best resume document after pruning.
 Good fit:
 
 - Same workstream, goals, and general direction
-- New information mostly changes current state, remaining work, blockers, or a few decisions
+- New information mostly changes current state, remaining work, blockers, or a few
+  decisions
 - The revised ledger will still fit within the recommended size
-- A future agent could safely treat the updated latest ledger as the primary resume document
+- A future agent could safely treat the updated latest ledger as the primary resume
+  document
 
 Prefer this option when it remains a good resume document.
 
@@ -87,7 +90,8 @@ Use this when there is a real boundary that deserves its own resumable chunk.
 
 Good fit:
 
-- A new phase started: planning -> implementation, backend -> frontend, spike -> production
+- A new phase started: planning -> implementation, backend -> frontend, spike ->
+  production
 - A substantial new topic or branch of work opened
 - The previous ledger remains a useful closed snapshot
 - Folding the new session into the prior ledger would make it too long or muddy
@@ -100,32 +104,33 @@ Use this when the active resume path has become too long or repetitive.
 
 Good fit:
 
-- `claude.task.md` would otherwise point to more than about 3 ledgers
+- `agent.task.md` would otherwise point to more than about 3 ledgers
 - Multiple ledgers repeat the same background or decisions
 - Earlier ledgers contain outdated theories or superseded context
-- Resuming would require synthesis across many files instead of reading one current summary
+- Resuming would require synthesis across many files instead of reading one current
+  summary
 
 When consolidating:
 
 - Write one ledger that captures the current truth
 - Explicitly note which older ledgers it supersedes for resume purposes
-- Update `claude.task.md` so the resume list points to the files still worth reading
+- Update `agent.task.md` so the resume list points to the files still worth reading
 
 ### Thresholds
 
 - `0-2` active ledgers: usually fine
 - `3` active ledgers: acceptable only if each has clearly distinct scope
 - `4+` active ledgers: consider consolidation
-- If the latest ledger would become hard to scan after cleanup, either split at a real phase
-  boundary or consolidate
+- If the latest ledger would become hard to scan after cleanup, either split at a real
+  phase boundary or consolidate
 
 ## Steps
 
 ### 1. Inspect existing resume context
 
-- List existing `claude.ledger.*.md` files in the project root using `ls claude.ledger.*.md`
+- List existing `agent.ledger.*.md` files in the project root using `ls agent.ledger.*.md`
   via Bash (these files are gitignored, so Grep/Glob will silently skip them).
-- Read the latest ledger first, and any other ledgers still referenced by `claude.task.md`.
+- Read the latest ledger first, and any other ledgers still referenced by `agent.task.md`.
 - Decide whether to:
   - update the latest ledger in place
   - create a new ledger for a new phase
@@ -163,7 +168,7 @@ Notes:
 - Add file paths only where they materially help the next session.
 - Use compact bullets and short paragraphs. Avoid deep nesting.
 
-### 3. Update `claude.task.md`
+### 3. Update `agent.task.md`
 
 - If missing header, prepend:
 
@@ -178,13 +183,13 @@ Notes:
 
   Read these files sequentially to resume:
 
-  - `./claude.ledger.N.md` — 1-line reason this file is still worth reading
-  - `./claude.ledger.M.md` — when still independently valuable
+  - `./agent.ledger.N.md` — 1-line reason this file is still worth reading
+  - `./agent.ledger.M.md` — when still independently valuable
   ```
 
 - Keep this list **focused**. Do not link every historical ledger by default.
 - Remove older ledgers from the resume list when a newer ledger clearly supersedes them.
 - Older ledgers may stay on disk, but currently useful ones should remain in the task
   file's resume sequence.
-- After reading them, tell the user which files (including the claude.task.md file) that
+- After reading them, tell the user which files (including the agent.task.md file) that
   you read to resume context.
