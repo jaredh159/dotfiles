@@ -10,7 +10,7 @@ run with Node's native type stripping (no build step). Zero npm dependencies.
 - `gtask --clean` — remove task directories whose PRs have been merged
 - `gtask --discard` — mark current task for cleanup without merge check
 - `gtask --keep` — toggle protection on current task (prevents cleanup even if merged)
-- `gtask --sync` — drop and recreate current task's databases from `gertrude_sync`, then migrate
+- `gtask --sync` — drop and recreate current task's databases from `gertrude_sync`
 - `gtask --heavy` — from inside a task dir, run the full warm-up/build/test pass that `--light` skips
 
 ## What `create` does

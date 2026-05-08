@@ -1,4 +1,4 @@
-import { basename, join, relative } from "node:path";
+import { basename, relative } from "node:path";
 import { execSync } from "node:child_process";
 import { TASKS_DIR, TEMPLATE_DATABASE } from "./constants.ts";
 import { dbNameFromDir } from "./parse.ts";
@@ -23,9 +23,6 @@ export function sync(): void {
 
   console.log(`recreating from ${TEMPLATE_DATABASE}...`);
   execSync(`createdb -T ${TEMPLATE_DATABASE} ${dbName}`, { stdio: "inherit" });
-
-  console.log(`running migrate-up...`);
-  execSync(`just migrate-up`, { cwd: join(taskRoot, "swift"), stdio: "inherit" });
 
   console.log(`done`);
 }

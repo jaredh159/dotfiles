@@ -95,7 +95,7 @@ describe("usageLines", () => {
       "  That means local task files can be created right away while clone/build/test work continues.",
       "",
       "Other commands:",
-      "  gtask --sync         Recreate this task's databases from gertrude_sync, then migrate.",
+      "  gtask --sync         Recreate this task's databases from gertrude_sync.",
       "  gtask --heavy        Run the full warm-up/build/test pass in the current task dir.",
       "  gtask --discard      Mark the current task for cleanup even without a merged PR.",
       "  gtask --keep         Toggle cleanup protection for the current task.",
