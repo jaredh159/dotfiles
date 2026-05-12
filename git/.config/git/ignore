@@ -6,5 +6,9 @@ claude.task.md
 claude.ledger.*.md
 claude.plan.*.md
 claude.report.*.md
+agent.task.md
+agent.ledger.*.md
+agent.plan.*.md
+agent.report.*.md
 task.scratch.md
 .gtask-*

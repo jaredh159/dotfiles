@@ -2,11 +2,11 @@
 description: Prep a task before starting implementation
 ---
 
-Read the main `./AGENTS.md` file, and then check for a `./agents.task.md` file, and any
-context catchup (ledger) files (pattern: `./agents.ledger.*.md`) referenced in the task
+Read the main `./AGENTS.md` file, and then check for a `./agent.task.md` file, and any
+context catchup (ledger) files (pattern: `./agent.ledger.*.md`) referenced in the task
 file, reading all of them, if they exist, in order.
 
-**Important:** These files are gitignored. Use `ls agents.ledger.*.md` via Bash to find
+**Important:** These files are gitignored. Use `ls agent.ledger.*.md` via Bash to find
 them — Grep and Glob use ripgrep which silently skips gitignored files.
 
 Summarize your understanding of the task and context in < 20 lines. If something seems
