@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-export PATH="/opt/homebrew/opt/postgresql@17/bin:/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+export PATH="/opt/homebrew/opt/postgresql@17/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/local/sbin:$PATH"
+ENV_FILE="${GERTRUDE_DB_SYNC_ENV_FILE:-$HOME/.dotfiles/secrets.local}"
 
 PGDATA="/opt/homebrew/var/postgresql@17"
 PGPID="$PGDATA/postmaster.pid"
@@ -42,6 +43,13 @@ if [[ $HOUR -lt 5 || $HOUR -ge 22 ]]; then
   exit 0
 fi
 
+if [[ -f "$ENV_FILE" ]]; then
+  set -a
+  # shellcheck disable=SC1090
+  source "$ENV_FILE"
+  set +a
+fi
+
 SYNC_DIR="$HOME/gertie/infra"
 if [[ ! -f "$SYNC_DIR/db-sync.mjs" ]]; then
   echo "ERROR: $SYNC_DIR/db-sync.mjs not found"
@@ -57,7 +65,7 @@ if ! ensure_postgres; then
 fi
 
 echo "$(date): Starting gertrude_sync refresh..."
-if node "$SYNC_DIR/db-sync.mjs"; then
+if node "$SYNC_DIR/db-sync.mjs" "$@"; then
   touch "$HOME/.gtask-last-sync"
   echo "$(date): Sync complete"
 else
