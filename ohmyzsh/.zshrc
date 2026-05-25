@@ -140,6 +140,11 @@ alias jsondiff='pdiffjson --sort-arrays'
 alias sombrero='/Users/jared/playground/sombrero/target/release/sombrero -v "$@"'
 alias bacon='CARGO_TARGET_DIR=target_bacon bacon "$@"'
 alias claudemux='/Users/jared/jaredh159/claude-usage-tmux/refresh.sh'
+alias sound-work='sound work'
+alias sound-beats='sound beats'
+alias sound-builtins='sound builtins'
+alias sound-current='sound current'
+alias sound-devices='sound devices'
 
 # bun completions
 [ -s "/Users/jared/.bun/_bun" ] && source "/Users/jared/.bun/_bun"

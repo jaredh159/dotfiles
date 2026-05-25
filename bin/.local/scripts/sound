@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SWITCH_AUDIO="${SWITCH_AUDIO:-SwitchAudioSource}"
+BLUEUTIL="${BLUEUTIL:-blueutil}"
+
+MIC="${SOUND_MIC:-Saramonic BTW}"
+SPEAKERS="${SOUND_SPEAKERS:-MacBook Pro Speakers}"
+BUILTIN_MIC="${SOUND_BUILTIN_MIC:-MacBook Pro Microphone}"
+BEATS="${SOUND_BEATS:-Blue Beats}"
+BEATS_ID="${SOUND_BEATS_ID:-88-b9-45-17-b4-4c}"
+
+die() {
+  printf 'sound: %s\n' "$*" >&2
+  exit 1
+}
+
+need() {
+  command -v "$1" >/dev/null 2>&1 || die "$1 is not installed"
+}
+
+audio_has_device() {
+  "$SWITCH_AUDIO" -a -t "$1" | grep -Fxq "$2"
+}
+
+set_audio() {
+  local type="$1"
+  local device="$2"
+
+  audio_has_device "$type" "$device" || die "$device is not available as $type"
+  "$SWITCH_AUDIO" -t "$type" -s "$device" >/dev/null
+}
+
+set_output() {
+  set_audio output "$1"
+  set_audio system "$1"
+}
+
+connect_beats() {
+  need "$BLUEUTIL"
+
+  if [[ "$("$BLUEUTIL" --is-connected "$BEATS_ID")" != "1" ]]; then
+    "$BLUEUTIL" --connect "$BEATS_ID" >/dev/null || true
+    "$BLUEUTIL" --wait-connect "$BEATS_ID" 10 >/dev/null || true
+  fi
+
+  for _ in {1..15}; do
+    audio_has_device output "$BEATS" && return 0
+    sleep 1
+  done
+
+  die "$BEATS is paired but not available as an output device"
+}
+
+current() {
+  printf 'input:  %s\n' "$("$SWITCH_AUDIO" -c -t input)"
+  printf 'output: %s\n' "$("$SWITCH_AUDIO" -c -t output)"
+  printf 'system: %s\n' "$("$SWITCH_AUDIO" -c -t system)"
+}
+
+devices() {
+  printf 'inputs:\n'
+  "$SWITCH_AUDIO" -a -t input | sed 's/^/  /'
+  printf '\noutputs:\n'
+  "$SWITCH_AUDIO" -a -t output | sed 's/^/  /'
+}
+
+usage() {
+  cat <<EOF
+usage: sound <work|beats|builtins|current|devices>
+EOF
+}
+
+need "$SWITCH_AUDIO"
+
+case "${1:-}" in
+  work)
+    set_output "$SPEAKERS"
+    set_audio input "$MIC"
+    current
+    ;;
+  beats)
+    connect_beats
+    set_output "$BEATS"
+    set_audio input "$MIC"
+    current
+    ;;
+  builtins)
+    set_output "$SPEAKERS"
+    set_audio input "$BUILTIN_MIC"
+    current
+    ;;
+  current)
+    current
+    ;;
+  devices)
+    devices
+    ;;
+  -h|--help|help|"")
+    usage
+    ;;
+  *)
+    usage >&2
+    exit 64
+    ;;
+esac
