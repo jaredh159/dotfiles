@@ -4,6 +4,9 @@
     "allow": [
       "Edit(*)"
     ],
+    "deny": [
+      "AskUserQuestion"
+    ],
     "defaultMode": "acceptEdits"
   },
   "enabledPlugins": {
