@@ -447,6 +447,147 @@
       ]
     },
     {
+      "description": "Kinesis Home key arrow layer",
+      "manipulators": [
+        {
+          "type": "basic",
+          "conditions": [
+            {
+              "type": "device_if",
+              "identifiers": [
+                {
+                  "is_keyboard": true,
+                  "product_id": 258,
+                  "vendor_id": 10730
+                },
+                {
+                  "is_keyboard": true,
+                  "product_id": 866,
+                  "vendor_id": 10730,
+                  "is_pointing_device": true
+                },
+                {
+                  "is_keyboard": true,
+                  "product_id": 24926,
+                  "vendor_id": 7504,
+                  "is_pointing_device": true
+                }
+              ]
+            }
+          ],
+          "from": {
+            "key_code": "home",
+            "modifiers": {
+              "optional": ["any"]
+            }
+          },
+          "to": [
+            {
+              "set_variable": {
+                "name": "kinesis_home_layer",
+                "value": 1
+              }
+            },
+            {
+              "key_code": "left_option"
+            }
+          ],
+          "to_after_key_up": [
+            {
+              "set_variable": {
+                "name": "kinesis_home_layer",
+                "value": 0
+              }
+            }
+          ]
+        },
+        {
+          "type": "basic",
+          "conditions": [
+            {
+              "type": "variable_if",
+              "name": "kinesis_home_layer",
+              "value": 1
+            }
+          ],
+          "from": {
+            "key_code": "h",
+            "modifiers": {
+              "optional": ["any"]
+            }
+          },
+          "to": [
+            {
+              "key_code": "left_arrow"
+            }
+          ]
+        },
+        {
+          "type": "basic",
+          "conditions": [
+            {
+              "type": "variable_if",
+              "name": "kinesis_home_layer",
+              "value": 1
+            }
+          ],
+          "from": {
+            "key_code": "j",
+            "modifiers": {
+              "optional": ["any"]
+            }
+          },
+          "to": [
+            {
+              "key_code": "down_arrow"
+            }
+          ]
+        },
+        {
+          "type": "basic",
+          "conditions": [
+            {
+              "type": "variable_if",
+              "name": "kinesis_home_layer",
+              "value": 1
+            }
+          ],
+          "from": {
+            "key_code": "k",
+            "modifiers": {
+              "optional": ["any"]
+            }
+          },
+          "to": [
+            {
+              "key_code": "up_arrow"
+            }
+          ]
+        },
+        {
+          "type": "basic",
+          "conditions": [
+            {
+              "type": "variable_if",
+              "name": "kinesis_home_layer",
+              "value": 1
+            }
+          ],
+          "from": {
+            "key_code": "l",
+            "modifiers": {
+              "optional": ["any"]
+            }
+          },
+          "to": [
+            {
+              "key_code": "right_arrow"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "description": "Change option + h/j/k/l to Arrows",
       "manipulators": [
         {
