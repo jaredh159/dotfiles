@@ -1,11 +1,16 @@
 import { join, basename, relative } from "node:path";
 import { tmpdir } from "node:os";
-import { existsSync } from "node:fs";
+import { existsSync, rmSync } from "node:fs";
 import { background } from "./exec.ts";
 import { warmupCommands } from "./create.ts";
-import { TASKS_DIR, SLOT_FILE } from "./constants.ts";
+import { TASKS_DIR, SLOT_FILE, MOTHBALL_FILE } from "./constants.ts";
 import { readSlot, portsForSlot } from "./slot.ts";
 import { currentTaskRoot } from "./task-root.ts";
+
+// Rewarming clears mothballed state: the build output is about to be rebuilt.
+export function clearMothballMarker(taskRoot: string): void {
+  rmSync(join(taskRoot, MOTHBALL_FILE), { force: true });
+}
 
 export function heavy(): void {
   let taskRoot: string;
@@ -30,6 +35,8 @@ export function heavy(): void {
     console.error(`invalid ${SLOT_FILE} in ${relative(TASKS_DIR, taskRoot)}`);
     process.exit(1);
   }
+
+  clearMothballMarker(taskRoot);
 
   const ports = portsForSlot(slot);
   const logFile = join(tmpdir(), `gtask-heavy-${dirName}.log`);

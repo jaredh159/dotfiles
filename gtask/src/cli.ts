@@ -1,6 +1,6 @@
 export type ParsedCommand =
   | { type: "create"; slug: string; light: boolean }
-  | { type: "clean" | "discard" | "keep" | "sync" | "heavy" | "help" };
+  | { type: "clean" | "discard" | "keep" | "sync" | "heavy" | "mothball" | "help" };
 
 const FLAG_COMMANDS = new Map<string, ParsedCommand["type"]>([
   ["--clean", "clean"],
@@ -8,11 +8,20 @@ const FLAG_COMMANDS = new Map<string, ParsedCommand["type"]>([
   ["--keep", "keep"],
   ["--sync", "sync"],
   ["--heavy", "heavy"],
+  ["--mothball", "mothball"],
   ["--help", "help"],
   ["-h", "help"],
 ]);
 
-const RESERVED_WORDS = new Set(["clean", "discard", "keep", "sync", "heavy", "help"]);
+const RESERVED_WORDS = new Set([
+  "clean",
+  "discard",
+  "keep",
+  "sync",
+  "heavy",
+  "mothball",
+  "help",
+]);
 const VALID_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const CREATE_FLAGS = new Set(["--light"]);
 
@@ -63,6 +72,7 @@ export function usageLines(): string[] {
     "       gtask --keep",
     "       gtask --sync",
     "       gtask --heavy",
+    "       gtask --mothball",
     "",
     "Creates an isolated Gertrude task dir under ~/gertie/tasks/<slug>-<MMDDYY>.",
     "Each task gets its own git branch, databases, env files, and reserved port slot.",
@@ -77,6 +87,7 @@ export function usageLines(): string[] {
     "Other commands:",
     "  gtask --sync         Recreate this task's databases from gertrude_sync.",
     "  gtask --heavy        Run the full warm-up/build/test pass in the current task dir.",
+    "  gtask --mothball     Delete build output (.build, node_modules, .nx) to reclaim disk; rebuild with --heavy.",
     "  gtask --discard      Mark the current task for cleanup even without a merged PR.",
     "  gtask --keep         Toggle cleanup protection for the current task.",
     "  gtask --clean        Remove merged/discarded task dirs. ⚠ Only Jared should ever run this.",

@@ -12,6 +12,7 @@ run with Node's native type stripping (no build step). Zero npm dependencies.
 - `gtask --keep` — toggle protection on current task (prevents cleanup even if merged)
 - `gtask --sync` — drop and recreate current task's databases from `gertrude_sync`
 - `gtask --heavy` — from inside a task dir, run the full warm-up/build/test pass that `--light` skips
+- `gtask --mothball` — from inside a task dir, delete regenerable build output to reclaim disk while keeping all source/history
 
 ## What `create` does
 
@@ -32,6 +33,36 @@ If you start light and later want the full deep-work pass, run `gtask --heavy` f
 that task directory. It backgrounds the same warm-up sequence used by a normal full create.
 
 Returns to the shell immediately — only the staging dir setup is synchronous.
+
+## What `mothball` does
+
+For tasks that are dormant/on ice but you don't want to delete. Run it from inside a task
+dir to reclaim disk by deleting only regenerable, gitignored build output:
+
+- `.build` (SwiftPM build dirs — typically ~95% of a task's footprint)
+- `node_modules` (pnpm workspaces under `swift/` and `web/`)
+- `.nx` (Nx cache)
+
+See `MOTHBALL_TARGETS` in `constants.ts` for the exact list. It removes these top-level
+matches via `rm -rf` (pruning so a nested match is removed with its parent) and reports
+the space freed. Everything else is left untouched: the `.git` repo and all commits,
+tracked source, uncommitted edits and untracked new files, env files, and the
+`.gtask-slot`/`.gtask-ports` config.
+
+It deliberately does **not** use `git clean`: each `.build/checkouts/*` is a nested git
+repo that `git clean` skips (leaving the bulk of the disk usage behind), and `git clean -X`
+would also wipe the gitignored env and `.gtask-*` config needed to resume the task.
+
+### Mothballed state
+
+Mothball writes a `.gtask-mothball` marker (an ISO timestamp) so the state is explicit
+rather than inferred. The `already mothballed` message keys on this marker, so a
+never-warmed `--light` task (which also has no build output) is not mistaken for a
+mothballed one. The marker is gitignored via the global `.gtask-*` rule.
+
+To wake a mothballed task back up, run `gtask --heavy` inside it: it rebuilds everything
+**and** clears the `.gtask-mothball` marker as its first step (`clearMothballMarker`), so
+heavy is the explicit un-mothball. Marker present = dormant; absent = active.
 
 ## What `clean` does
 
@@ -79,6 +110,7 @@ such as `KEYCHAIN_CRAWLER_URL` and `KEYCHAIN_CRAWLER_AUTH_TOKEN`.
 - `src/discard.ts` — mark task for discard
 - `src/keep.ts` — toggle keep protection on task
 - `src/sync.ts` — recreate task databases from template
+- `src/mothball.ts` — delete regenerable build output to reclaim disk
 - `src/slot.ts` — slot allocation and port calculation
 - `src/template.ts` — env template resolution
 - `src/parse.ts` — dir name parsing, datestamp, db name derivation
