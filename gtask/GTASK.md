@@ -13,6 +13,7 @@ run with Node's native type stripping (no build step). Zero npm dependencies.
 - `gtask --sync` — drop and recreate current task's databases from `gertrude_sync`
 - `gtask --heavy` — from inside a task dir, run the full warm-up/build/test pass that `--light` skips
 - `gtask --mothball` — from inside a task dir, delete regenerable build output to reclaim disk while keeping all source/history
+- `gtask --list` — list task directories newest first, with created timestamps
 
 ## What `create` does
 
@@ -111,6 +112,7 @@ such as `KEYCHAIN_CRAWLER_URL` and `KEYCHAIN_CRAWLER_AUTH_TOKEN`.
 - `src/keep.ts` — toggle keep protection on task
 - `src/sync.ts` — recreate task databases from template
 - `src/mothball.ts` — delete regenerable build output to reclaim disk
+- `src/list.ts` — task directory table listing
 - `src/slot.ts` — slot allocation and port calculation
 - `src/template.ts` — env template resolution
 - `src/parse.ts` — dir name parsing, datestamp, db name derivation

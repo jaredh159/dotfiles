@@ -5,6 +5,7 @@ import { keep } from "./keep.ts";
 import { sync } from "./sync.ts";
 import { heavy } from "./heavy.ts";
 import { mothball } from "./mothball.ts";
+import { list } from "./list.ts";
 import { parseArgs, usageLines } from "./cli.ts";
 
 function printUsage(): void {
@@ -41,6 +42,8 @@ if (parsed.type === "clean") {
   heavy();
 } else if (parsed.type === "mothball") {
   mothball();
+} else if (parsed.type === "list") {
+  list();
 } else {
   await create(parsed.slug, { light: parsed.light });
 }

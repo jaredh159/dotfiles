@@ -31,6 +31,7 @@ describe("parseArgs", () => {
     assert.deepStrictEqual(parseArgs(["--sync"]), { type: "sync" });
     assert.deepStrictEqual(parseArgs(["--heavy"]), { type: "heavy" });
     assert.deepStrictEqual(parseArgs(["--mothball"]), { type: "mothball" });
+    assert.deepStrictEqual(parseArgs(["--list"]), { type: "list" });
   });
 
   it("rejects bare command names", () => {
@@ -85,6 +86,7 @@ describe("usageLines", () => {
       "       gtask --sync",
       "       gtask --heavy",
       "       gtask --mothball",
+      "       gtask --list",
       "",
       "Creates an isolated Gertrude task dir under ~/gertie/tasks/<slug>-<MMDDYY>.",
       "Each task gets its own git branch, databases, env files, and reserved port slot.",
@@ -100,6 +102,7 @@ describe("usageLines", () => {
       "  gtask --sync         Recreate this task's databases from gertrude_sync.",
       "  gtask --heavy        Run the full warm-up/build/test pass in the current task dir.",
       "  gtask --mothball     Delete build output (.build, node_modules, .nx) to reclaim disk; rebuild with --heavy.",
+      "  gtask --list         List task dirs by creation date.",
       "  gtask --discard      Mark the current task for cleanup even without a merged PR.",
       "  gtask --keep         Toggle cleanup protection for the current task.",
       "  gtask --clean        Remove merged/discarded task dirs. ⚠ Only Jared should ever run this.",
