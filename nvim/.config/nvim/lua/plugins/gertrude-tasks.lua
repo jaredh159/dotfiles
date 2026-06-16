@@ -22,7 +22,8 @@ local function get_tasks_sorted_by_mtime()
     end
     if type == "directory" then
       local path = TASKS_DIR .. "/" .. name
-      local stat = vim.loop.fs_stat(path)
+      local is_gtask = vim.loop.fs_stat(path .. "/.gtask-slot") ~= nil
+      local stat = is_gtask and vim.loop.fs_stat(path) or nil
       if stat then
         table.insert(tasks, {
           name = name,

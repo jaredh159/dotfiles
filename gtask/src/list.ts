@@ -1,6 +1,6 @@
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { TASKS_DIR } from "./constants.ts";
+import { TASKS_DIR, SLOT_FILE } from "./constants.ts";
 import { cyan, green, yellow } from "./color.ts";
 
 export type TaskListRow = {
@@ -26,6 +26,7 @@ export function list(root = TASKS_DIR): void {
 export function collectTaskRows(root: string): TaskListRow[] {
   return readdirSync(root, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
+    .filter((entry) => existsSync(join(root, entry.name, SLOT_FILE)))
     .map((entry) => {
       const dir = join(root, entry.name);
       const stats = statSync(dir);
