@@ -23,6 +23,7 @@ export ANDROID_HOME=$HOME/Library/Android/sdk
 
 # swift/gertrude
 export TASK_MEGA_YIELD_COUNT=100
+export NGROK_SUBDOMAIN=sweet-carefully-tarpon
 
 # Source secrets if they exist.
 [ -f "$HOME/.dotfiles/secrets.local" ] && source "$HOME/.dotfiles/secrets.local"
@@ -32,7 +33,7 @@ export TASK_MEGA_YIELD_COUNT=100
 # export DISABLE_AUTOUPDATER=1
 
 # disable auto 1m context window
-export CLAUDE_CODE_DISABLE_1M_CONTEXT=1
+# export CLAUDE_CODE_DISABLE_1M_CONTEXT=1
 
 # clear out the path, start brand new
 PATH=""
