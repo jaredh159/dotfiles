@@ -49,6 +49,9 @@ path easier to read.
 - Background-task / async / helper extraction details unless they affect future work
 - File-by-file inventories when a compact grouped summary is enough
 - Low-value "nothing in progress" sections that add little information
+- Transient git state (uncommitted files, "still need to commit X") — it goes stale fast,
+  so keep it light. If you do record it, run `git status` first to verify rather than
+  trusting your memory of the session; the user may have committed or changed things.
 
 ## Token efficiency rules
 
