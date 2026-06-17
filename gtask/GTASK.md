@@ -67,9 +67,47 @@ heavy is the explicit un-mothball. Marker present = dormant; absent = active.
 
 ## What `clean` does
 
-1. Scans `~/gertie/tasks/` for task directories
-2. Checks GitHub for merged PRs matching each branch
-3. Backgrounds: kills ports/tmux sessions, drops databases, removes directories
+1. Prunes expired bundles from the rescue attic (see below)
+2. Scans `~/gertie/tasks/` for task directories
+3. Checks GitHub for merged PRs matching each branch
+4. Rescues irreplaceable context from each doomed dir into the attic
+5. Backgrounds: kills ports/tmux sessions, drops databases, removes directories
+
+### What counts as a task directory
+
+Auto-cleanup (the merged-PR path) only ever touches **real gtask task dirs** —
+those with a `.gtask-slot` marker, the same canonical signal `--list` uses. A stray
+folder under `~/gertie/tasks/` (hand-created notes, an agent scratch dir) is reported
+as `skipping: <name> (not a task dir)` and left untouched.
+
+The one exception is an explicit `.gtask-discard` marker, which is honored on **any**
+directory regardless of the slot marker — `gtask --discard` / a hand-placed
+`.gtask-discard` is still how you force-remove a non-task dir. `.gtask-keep` continues
+to protect a dir from cleanup entirely.
+
+## Context rescue (the attic)
+
+Task dirs accumulate irreplaceable, gitignored context — `agent.ledger.*.md`,
+`agent.task.md`, scratch `*.sql` dumps, ad-hoc notes — that vanishes forever when the
+dir is deleted. Before `--clean` removes any directory, it copies that context into a
+rescue attic so a mistaken or premature cleanup is recoverable.
+
+- **Location:** `~/gertie/.gtask-attic/<dirname>-<YYYYMMDD-HHMMSS>/`, a sibling of
+  `tasks/` (so `--clean`/`--list` never treat it as a task), preserving the original
+  relative paths plus a `RESCUE.txt` manifest.
+- **What gets rescued:** files whose extension is in `RESCUE_EXTENSIONS` (`.md`, `.sql`,
+  `.txt`, `.json`, `.csv`), no deeper than `RESCUE_MAX_DEPTH` path segments (root + one
+  level), excluding `RESCUE_PRUNE_DIRS` (`.git`, `.next`, `.build`, `node_modules`, `.nx`).
+- **What is skipped:** anything git already stores safely — tracked files with no
+  uncommitted changes. A merged PR puts those on the remote, so only untracked,
+  gitignored, or modified files are worth saving. A non-git dir has no "safe" set, so
+  every matching file is rescued.
+- **Retention:** each `--clean` first prunes attic bundles older than
+  `RESCUE_RETENTION_DAYS` (60), so the attic stays bounded while leaving roughly two
+  months to recover something. Rescue copies (never moves), so the subsequent `rm -rf`
+  remains the only delete.
+
+Tunable knobs live in `constants.ts` (`RESCUE_*`).
 
 ## Port isolation
 
@@ -108,6 +146,7 @@ such as `KEYCHAIN_CRAWLER_URL` and `KEYCHAIN_CRAWLER_AUTH_TOKEN`.
 - `src/main.ts` — CLI entry point
 - `src/create.ts` — task creation
 - `src/clean.ts` — merged task cleanup
+- `src/rescue.ts` — copy irreplaceable context to the attic before deletion
 - `src/discard.ts` — mark task for discard
 - `src/keep.ts` — toggle keep protection on task
 - `src/sync.ts` — recreate task databases from template

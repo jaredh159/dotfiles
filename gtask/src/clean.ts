@@ -3,9 +3,16 @@ import { join, basename } from "node:path";
 import { parseBranchFromDir, dbNameFromDir } from "./parse.ts";
 import { execSafe } from "./exec.ts";
 import { background } from "./exec.ts";
-import { red, green, yellow, cyan } from "./color.ts";
+import { red, green, yellow, cyan, gray } from "./color.ts";
 import { readSlot, portsForSlot } from "./slot.ts";
-import { TASKS_DIR, REPO, DISCARD_FILE, KEEP_FILE } from "./constants.ts";
+import { rescueFiles, pruneAttic } from "./rescue.ts";
+import {
+  TASKS_DIR,
+  REPO,
+  DISCARD_FILE,
+  KEEP_FILE,
+  SLOT_FILE,
+} from "./constants.ts";
 
 function getMergedPrCount(branch: string): number {
   const result = execSafe(
@@ -20,6 +27,12 @@ export async function clean(): Promise<void> {
     process.exit(1);
   }
 
+  const now = new Date();
+  const prunedAttic = pruneAttic(now);
+  if (prunedAttic.length > 0) {
+    console.log(gray(`attic:    pruned ${prunedAttic.length} expired bundle(s)`));
+  }
+
   const entries = readdirSync(TASKS_DIR, { withFileTypes: true })
     .filter((e) => e.isDirectory())
     .map((e) => e.name);
@@ -29,10 +42,12 @@ export async function clean(): Promise<void> {
 
   const discarded: string[] = [];
   const kept: string[] = [];
+  const skipped: string[] = [];
 
   for (const dirname of entries) {
     const dir = join(TASKS_DIR, dirname);
 
+    // Explicit discard always wins, even for non-task dirs.
     if (existsSync(join(dir, DISCARD_FILE))) {
       discarded.push(dir);
       continue;
@@ -40,6 +55,14 @@ export async function clean(): Promise<void> {
 
     if (existsSync(join(dir, KEEP_FILE))) {
       kept.push(dirname);
+      continue;
+    }
+
+    // Only auto-clean real gtask task dirs. Anything without the slot marker
+    // (stray notes, manually created folders) is left alone unless explicitly
+    // discarded above.
+    if (!existsSync(join(dir, SLOT_FILE))) {
+      skipped.push(dirname);
       continue;
     }
 
@@ -70,9 +93,24 @@ export async function clean(): Promise<void> {
     console.log(green(`keeping:  ${dirname}`));
   }
 
+  for (const dirname of skipped) {
+    console.log(gray(`skipping: ${dirname} (not a task dir)`));
+  }
+
   toDelete.push(...discarded);
 
   if (toDelete.length === 0) return;
+
+  // Rescue irreplaceable context (gitignored ledgers/notes, uncommitted SQL)
+  // into the attic before anything is destroyed.
+  for (const dir of toDelete) {
+    const result = rescueFiles(dir, now);
+    if (result.count > 0) {
+      console.log(
+        cyan(`rescued:  ${result.count} file(s) from ${basename(dir)} -> .gtask-attic/${result.bundle}`)
+      );
+    }
+  }
 
   const portKills = toDelete.flatMap((dir) => {
     const slot = readSlot(dir);

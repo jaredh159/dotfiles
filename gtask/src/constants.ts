@@ -27,6 +27,17 @@ export const TEMPLATE_DATABASE = "gertrude_sync";
 // by `gtask --heavy` (SwiftPM `.build`, pnpm `node_modules`, Nx cache).
 export const MOTHBALL_TARGETS = [".build", "node_modules", ".nx"];
 
+// Before `--clean` deletes a task dir, irreplaceable agent context (gitignored
+// ledgers/notes, uncommitted scratch SQL) is copied into RESCUE_DIR so a deleted
+// dir can be recovered for a while. Bundles older than RESCUE_RETENTION_DAYS are
+// pruned at the start of each clean run. RESCUE_DIR is a sibling of TASKS_DIR so
+// `--clean`/`--list` never treat it as a task.
+export const RESCUE_DIR = join(homedir(), "gertie", ".gtask-attic");
+export const RESCUE_EXTENSIONS = [".md", ".sql", ".txt", ".json", ".csv"];
+export const RESCUE_PRUNE_DIRS = [".git", ".next", ...MOTHBALL_TARGETS];
+export const RESCUE_MAX_DEPTH = 2; // path segments: root files + one level deep
+export const RESCUE_RETENTION_DAYS = 60;
+
 export const BASE_PORTS = {
   api: 8080,
   dash: 8081,
