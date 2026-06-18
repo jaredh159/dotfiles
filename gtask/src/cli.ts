@@ -1,6 +1,6 @@
 export type ParsedCommand =
   | { type: "create"; slug: string; light: boolean }
-  | { type: "clean" | "discard" | "keep" | "sync" | "heavy" | "mothball" | "list" | "help" };
+  | { type: "clean" | "discard" | "keep" | "sync" | "heavy" | "mothball" | "list" | "sidewatch" | "help" };
 
 const FLAG_COMMANDS = new Map<string, ParsedCommand["type"]>([
   ["--clean", "clean"],
@@ -10,6 +10,7 @@ const FLAG_COMMANDS = new Map<string, ParsedCommand["type"]>([
   ["--heavy", "heavy"],
   ["--mothball", "mothball"],
   ["--list", "list"],
+  ["--sidewatch", "sidewatch"],
   ["--help", "help"],
   ["-h", "help"],
 ]);
@@ -22,6 +23,7 @@ const RESERVED_WORDS = new Set([
   "heavy",
   "mothball",
   "list",
+  "sidewatch",
   "help",
 ]);
 const VALID_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -76,6 +78,7 @@ export function usageLines(): string[] {
     "       gtask --heavy",
     "       gtask --mothball",
     "       gtask --list",
+    "       gtask --sidewatch",
     "",
     "Creates an isolated Gertrude task dir under ~/gertie/tasks/<slug>-<MMDDYY>.",
     "Each task gets its own git branch, databases, env files, and reserved port slot.",
@@ -92,6 +95,7 @@ export function usageLines(): string[] {
     "  gtask --heavy        Run the full warm-up/build/test pass in the current task dir.",
     "  gtask --mothball     Delete build output (.build, node_modules, .nx) to reclaim disk; rebuild with --heavy.",
     "  gtask --list         List task dirs by creation date.",
+    "  gtask --sidewatch    Open/select a 3-pane task window in the sidewatch tmux session.",
     "  gtask --discard      Mark the current task for cleanup even without a merged PR.",
     "  gtask --keep         Toggle cleanup protection for the current task.",
     "  gtask --clean        Remove merged/discarded task dirs. ⚠ Only Jared should ever run this.",

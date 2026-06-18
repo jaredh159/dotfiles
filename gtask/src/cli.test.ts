@@ -32,6 +32,7 @@ describe("parseArgs", () => {
     assert.deepStrictEqual(parseArgs(["--heavy"]), { type: "heavy" });
     assert.deepStrictEqual(parseArgs(["--mothball"]), { type: "mothball" });
     assert.deepStrictEqual(parseArgs(["--list"]), { type: "list" });
+    assert.deepStrictEqual(parseArgs(["--sidewatch"]), { type: "sidewatch" });
   });
 
   it("rejects bare command names", () => {
@@ -87,6 +88,7 @@ describe("usageLines", () => {
       "       gtask --heavy",
       "       gtask --mothball",
       "       gtask --list",
+      "       gtask --sidewatch",
       "",
       "Creates an isolated Gertrude task dir under ~/gertie/tasks/<slug>-<MMDDYY>.",
       "Each task gets its own git branch, databases, env files, and reserved port slot.",
@@ -103,6 +105,7 @@ describe("usageLines", () => {
       "  gtask --heavy        Run the full warm-up/build/test pass in the current task dir.",
       "  gtask --mothball     Delete build output (.build, node_modules, .nx) to reclaim disk; rebuild with --heavy.",
       "  gtask --list         List task dirs by creation date.",
+      "  gtask --sidewatch    Open/select a 3-pane task window in the sidewatch tmux session.",
       "  gtask --discard      Mark the current task for cleanup even without a merged PR.",
       "  gtask --keep         Toggle cleanup protection for the current task.",
       "  gtask --clean        Remove merged/discarded task dirs. ⚠ Only Jared should ever run this.",
