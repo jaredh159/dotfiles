@@ -17,5 +17,18 @@
   "effortLevel": "xhigh",
   "skipDangerousModePermissionPrompt": true,
   "agentPushNotifEnabled": true,
-  "gitAttribution": false
+  "gitAttribution": false,
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.agent-hooks/gate-swift-direct.sh"
+          }
+        ]
+      }
+    ]
+  }
 }

@@ -8,6 +8,7 @@ stow:
 	stow bin
 	stow ghostty
 	stow kitty
+	stow agent-hooks
 	stow claude
 	stow codex
 	stow dictator
