@@ -32,7 +32,7 @@ if (parsed.type === "help") {
 }
 
 if (parsed.type === "clean") {
-  await clean();
+  await clean({ dryRun: parsed.dryRun });
 } else if (parsed.type === "discard") {
   discard();
 } else if (parsed.type === "keep") {

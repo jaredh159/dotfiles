@@ -8,6 +8,7 @@ run with Node's native type stripping (no build step). Zero npm dependencies.
 - `gtask <slug>` — create a new task directory at `~/gertie/tasks/<slug>-<MMDDYY>/`
 - `gtask --light <slug>` — create a new task directory but skip the expensive warm-up steps
 - `gtask --clean` — remove task directories whose PRs have been merged
+- `gtask --clean --dry-run` — report what `--clean` would remove without changing anything
 - `gtask --discard` — mark current task for cleanup without merge check
 - `gtask --keep` — toggle protection on current task (prevents cleanup even if merged)
 - `gtask --sync` — drop and recreate current task's databases from `gertrude_sync`
@@ -72,6 +73,10 @@ heavy is the explicit un-mothball. Marker present = dormant; absent = active.
 3. Checks GitHub for merged PRs matching each branch
 4. Rescues irreplaceable context from each doomed dir into the attic
 5. Backgrounds: kills ports/tmux sessions, drops databases, removes directories
+
+Use `gtask --clean --dry-run` (or `gtask --clean -n`) to run the same scan and print
+which task directories would be removed or kept without pruning the attic, rescuing
+files, killing processes/tmux panes, dropping databases, or deleting directories.
 
 ### What counts as a task directory
 

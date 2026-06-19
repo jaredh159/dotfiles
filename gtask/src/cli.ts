@@ -1,9 +1,11 @@
 export type ParsedCommand =
   | { type: "create"; slug: string; light: boolean }
-  | { type: "clean" | "discard" | "keep" | "sync" | "heavy" | "mothball" | "list" | "sidewatch" | "help" };
+  | { type: "clean"; dryRun: boolean }
+  | { type: "discard" | "keep" | "sync" | "heavy" | "mothball" | "list" | "sidewatch" | "help" };
 
-const FLAG_COMMANDS = new Map<string, ParsedCommand["type"]>([
-  ["--clean", "clean"],
+type FlagCommandType = Exclude<ParsedCommand["type"], "create" | "clean">;
+
+const FLAG_COMMANDS = new Map<string, FlagCommandType>([
   ["--discard", "discard"],
   ["--keep", "keep"],
   ["--sync", "sync"],
@@ -15,6 +17,8 @@ const FLAG_COMMANDS = new Map<string, ParsedCommand["type"]>([
   ["-h", "help"],
 ]);
 
+const CLEAN_FLAGS = new Set(["--clean"]);
+const DRY_RUN_FLAGS = new Set(["--dry-run", "-n"]);
 const RESERVED_WORDS = new Set([
   "clean",
   "discard",
@@ -72,6 +76,7 @@ export function usageLines(): string[] {
     "usage: gtask <slug>",
     "       gtask --light <slug>",
     "       gtask --clean",
+    "       gtask --clean --dry-run",
     "       gtask --discard",
     "       gtask --keep",
     "       gtask --sync",
@@ -99,6 +104,7 @@ export function usageLines(): string[] {
     "  gtask --discard      Mark the current task for cleanup even without a merged PR.",
     "  gtask --keep         Toggle cleanup protection for the current task.",
     "  gtask --clean        Remove merged/discarded task dirs. ⚠ Only Jared should ever run this.",
+    "  gtask --clean --dry-run  Report what clean would remove without changing anything.",
   ];
 }
 
@@ -109,6 +115,14 @@ export function parseArgs(args: string[]): ParsedCommand {
 
   if (args.length === 1) {
     const input = args[0];
+    if (CLEAN_FLAGS.has(input)) {
+      return { type: "clean", dryRun: false };
+    }
+
+    if (DRY_RUN_FLAGS.has(input)) {
+      throw new Error("`--dry-run` must be used with `gtask --clean`.");
+    }
+
     const flagCommand = FLAG_COMMANDS.get(input);
     if (flagCommand) {
       return { type: flagCommand };
@@ -122,6 +136,18 @@ export function parseArgs(args: string[]): ParsedCommand {
   }
 
   const [first, second] = args;
+  if (CLEAN_FLAGS.has(first) || CLEAN_FLAGS.has(second)) {
+    const other = CLEAN_FLAGS.has(first) ? second : first;
+    if (DRY_RUN_FLAGS.has(other)) {
+      return { type: "clean", dryRun: true };
+    }
+    throw new Error("`clean` does not take that extra argument.");
+  }
+
+  if (DRY_RUN_FLAGS.has(first) || DRY_RUN_FLAGS.has(second)) {
+    throw new Error("`--dry-run` must be used with `gtask --clean`.");
+  }
+
   if (first === "--light") {
     return parseSlug(second, true);
   }
@@ -146,6 +172,10 @@ export function parseArgs(args: string[]): ParsedCommand {
 }
 
 function parseSlug(input: string, light: boolean): ParsedCommand {
+  if (CLEAN_FLAGS.has(input)) {
+    return { type: "clean", dryRun: false };
+  }
+
   const flagCommand = FLAG_COMMANDS.get(input);
   if (flagCommand) {
     return { type: flagCommand };

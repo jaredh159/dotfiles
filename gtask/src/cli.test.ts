@@ -25,7 +25,22 @@ describe("parseArgs", () => {
   });
 
   it("parses supported flags", () => {
-    assert.deepStrictEqual(parseArgs(["--clean"]), { type: "clean" });
+    assert.deepStrictEqual(parseArgs(["--clean"]), {
+      type: "clean",
+      dryRun: false,
+    });
+    assert.deepStrictEqual(parseArgs(["--clean", "--dry-run"]), {
+      type: "clean",
+      dryRun: true,
+    });
+    assert.deepStrictEqual(parseArgs(["--dry-run", "--clean"]), {
+      type: "clean",
+      dryRun: true,
+    });
+    assert.deepStrictEqual(parseArgs(["--clean", "-n"]), {
+      type: "clean",
+      dryRun: true,
+    });
     assert.deepStrictEqual(parseArgs(["--discard"]), { type: "discard" });
     assert.deepStrictEqual(parseArgs(["--keep"]), { type: "keep" });
     assert.deepStrictEqual(parseArgs(["--sync"]), { type: "sync" });
@@ -70,6 +85,17 @@ describe("parseArgs", () => {
     assert.throws(() => parseArgs(["--light"]), /`--light` must be used with a task slug\./);
   });
 
+  it("rejects dry-run without clean", () => {
+    assert.throws(
+      () => parseArgs(["--dry-run"]),
+      /`--dry-run` must be used with `gtask --clean`\./
+    );
+    assert.throws(
+      () => parseArgs(["--dry-run", "--list"]),
+      /`--dry-run` must be used with `gtask --clean`\./
+    );
+  });
+
   it("supports help flags", () => {
     assert.deepStrictEqual(parseArgs(["--help"]), { type: "help" });
     assert.deepStrictEqual(parseArgs(["-h"]), { type: "help" });
@@ -82,6 +108,7 @@ describe("usageLines", () => {
       "usage: gtask <slug>",
       "       gtask --light <slug>",
       "       gtask --clean",
+      "       gtask --clean --dry-run",
       "       gtask --discard",
       "       gtask --keep",
       "       gtask --sync",
@@ -109,6 +136,7 @@ describe("usageLines", () => {
       "  gtask --discard      Mark the current task for cleanup even without a merged PR.",
       "  gtask --keep         Toggle cleanup protection for the current task.",
       "  gtask --clean        Remove merged/discarded task dirs. ⚠ Only Jared should ever run this.",
+      "  gtask --clean --dry-run  Report what clean would remove without changing anything.",
     ]);
   });
 });

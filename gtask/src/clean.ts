@@ -21,16 +21,25 @@ function getMergedPrCount(branch: string): number {
   return parseInt(result, 10) || 0;
 }
 
-export async function clean(): Promise<void> {
+export type CleanOptions = {
+  dryRun?: boolean;
+};
+
+export async function clean(options: CleanOptions = {}): Promise<void> {
   if (!existsSync(TASKS_DIR)) {
     console.error(`Tasks directory not found: ${TASKS_DIR}`);
     process.exit(1);
   }
 
+  const dryRun = options.dryRun ?? false;
   const now = new Date();
-  const prunedAttic = pruneAttic(now);
-  if (prunedAttic.length > 0) {
-    console.log(gray(`attic:    pruned ${prunedAttic.length} expired bundle(s)`));
+  if (dryRun) {
+    console.log(gray("dry-run:  no files, databases, ports, tmux panes, or attic bundles will be changed"));
+  } else {
+    const prunedAttic = pruneAttic(now);
+    if (prunedAttic.length > 0) {
+      console.log(gray(`attic:    pruned ${prunedAttic.length} expired bundle(s)`));
+    }
   }
 
   const entries = readdirSync(TASKS_DIR, { withFileTypes: true })
@@ -78,11 +87,11 @@ export async function clean(): Promise<void> {
   }
 
   for (const dir of discarded) {
-    console.log(yellow(`discard:  ${basename(dir)}`));
+    console.log(yellow(`${dryRun ? "would discard:" : "discard:"}  ${basename(dir)}`));
   }
 
   for (const dir of toDelete) {
-    console.log(red(`removing: ${basename(dir)}`));
+    console.log(red(`${dryRun ? "would remove:" : "removing:"} ${basename(dir)}`));
   }
 
   for (const dirname of kept) {
@@ -100,6 +109,8 @@ export async function clean(): Promise<void> {
   toDelete.push(...discarded);
 
   if (toDelete.length === 0) return;
+
+  if (dryRun) return;
 
   // Rescue irreplaceable context (gitignored ledgers/notes, uncommitted SQL)
   // into the attic before anything is destroyed.
