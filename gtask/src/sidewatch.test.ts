@@ -10,6 +10,13 @@ describe("sidewatchWindowName", () => {
     );
   });
 
+  it("removes a separator left before a legacy date suffix", () => {
+    assert.strictEqual(
+      sidewatchWindowName("/Users/jared/gertie/tasks/daily-email---06-17-2026"),
+      "daily-email"
+    );
+  });
+
   it("falls back to the directory name for unrecognized task dirs", () => {
     assert.strictEqual(
       sidewatchWindowName("/Users/jared/gertie/tasks/random-directory"),

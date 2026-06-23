@@ -12,6 +12,7 @@ run with Node's native type stripping (no build step). Zero npm dependencies.
 - `gtask --discard` — mark current task for cleanup without merge check
 - `gtask --keep` — toggle protection on current task (prevents cleanup even if merged)
 - `gtask --sync` — drop and recreate current task's databases from `gertrude_sync`
+- `gtask --psql` — open a `psql` shell connected to the current task's main database
 - `gtask --heavy` — from inside a task dir, run the full warm-up/build/test pass that `--light` skips
 - `gtask --mothball` — from inside a task dir, delete regenerable build output to reclaim disk while keeping all source/history
 - `gtask --list` — list task directories newest first, with created timestamps
@@ -155,6 +156,7 @@ such as `KEYCHAIN_CRAWLER_URL` and `KEYCHAIN_CRAWLER_AUTH_TOKEN`.
 - `src/discard.ts` — mark task for discard
 - `src/keep.ts` — toggle keep protection on task
 - `src/sync.ts` — recreate task databases from template
+- `src/psql.ts` — open a task-scoped PostgreSQL shell
 - `src/mothball.ts` — delete regenerable build output to reclaim disk
 - `src/list.ts` — task directory table listing
 - `src/slot.ts` — slot allocation and port calculation

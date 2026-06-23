@@ -24,7 +24,7 @@ function hasWindow(session: string, windowName: string): boolean {
 
 export function sidewatchWindowName(taskRoot: string): string {
   const dirname = basename(taskRoot);
-  return parseBranchFromDir(dirname) ?? dirname;
+  return (parseBranchFromDir(dirname) ?? dirname).replace(/-+$/, "");
 }
 
 export function sidewatch(): void {

@@ -1,7 +1,7 @@
 export type ParsedCommand =
   | { type: "create"; slug: string; light: boolean }
   | { type: "clean"; dryRun: boolean }
-  | { type: "discard" | "keep" | "sync" | "heavy" | "mothball" | "list" | "sidewatch" | "help" };
+  | { type: "discard" | "keep" | "sync" | "psql" | "heavy" | "mothball" | "list" | "sidewatch" | "help" };
 
 type FlagCommandType = Exclude<ParsedCommand["type"], "create" | "clean">;
 
@@ -9,6 +9,7 @@ const FLAG_COMMANDS = new Map<string, FlagCommandType>([
   ["--discard", "discard"],
   ["--keep", "keep"],
   ["--sync", "sync"],
+  ["--psql", "psql"],
   ["--heavy", "heavy"],
   ["--mothball", "mothball"],
   ["--list", "list"],
@@ -24,6 +25,7 @@ const RESERVED_WORDS = new Set([
   "discard",
   "keep",
   "sync",
+  "psql",
   "heavy",
   "mothball",
   "list",
@@ -80,6 +82,7 @@ export function usageLines(): string[] {
     "       gtask --discard",
     "       gtask --keep",
     "       gtask --sync",
+    "       gtask --psql",
     "       gtask --heavy",
     "       gtask --mothball",
     "       gtask --list",
@@ -97,6 +100,7 @@ export function usageLines(): string[] {
     "",
     "Other commands:",
     "  gtask --sync         Recreate this task's databases from gertrude_sync.",
+    "  gtask --psql         Open psql connected to this task's main database.",
     "  gtask --heavy        Run the full warm-up/build/test pass in the current task dir.",
     "  gtask --mothball     Delete build output (.build, node_modules, .nx) to reclaim disk; rebuild with --heavy.",
     "  gtask --list         List task dirs by creation date.",

@@ -3,6 +3,7 @@ import { clean } from "./clean.ts";
 import { discard } from "./discard.ts";
 import { keep } from "./keep.ts";
 import { sync } from "./sync.ts";
+import { psql } from "./psql.ts";
 import { heavy } from "./heavy.ts";
 import { mothball } from "./mothball.ts";
 import { list } from "./list.ts";
@@ -39,6 +40,8 @@ if (parsed.type === "clean") {
   keep();
 } else if (parsed.type === "sync") {
   sync();
+} else if (parsed.type === "psql") {
+  psql();
 } else if (parsed.type === "heavy") {
   heavy();
 } else if (parsed.type === "mothball") {
