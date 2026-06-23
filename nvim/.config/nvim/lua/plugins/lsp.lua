@@ -199,6 +199,20 @@ return {
         },
       }
 
+      vim.lsp.config("steve_lsp", {
+        cmd = {
+          "cargo",
+          "run",
+          "--quiet",
+          "--manifest-path",
+          "/Users/jared/jaredh159/steve/lsp/Cargo.toml",
+          "--",
+        },
+        filetypes = { "steve" },
+        root_markers = { ".git" },
+      })
+      vim.lsp.enable("steve_lsp")
+
       -- Ensure the servers and tools above are installed
       --
       -- To check the current status of installed tools and/or manually install
