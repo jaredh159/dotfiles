@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, writeFileSync, statSync, statfsSync } from "node
 import { join, dirname } from "node:path";
 import { homedir, tmpdir } from "node:os";
 import { makeTargetDir, dbNameFromDir, humanizeSlug } from "./parse.ts";
-import { background } from "./exec.ts";
+import { background, copyToClipboard } from "./exec.ts";
 import { loadTemplate, resolveTemplate, buildTemplateVars } from "./template.ts";
 import { allocateSlot, portsForSlot, portsFileContent } from "./slot.ts";
 import {
@@ -169,6 +169,8 @@ export async function create(slug: string, opts?: { light?: boolean }): Promise<
   const staging = join(tmpdir(), `gtask-staging-${dirName}`);
   mkdirSync(staging, { recursive: true });
   writeEnvFiles(staging, dbName, testDbName, ports);
+
+  copyToClipboard(target);
 
   const envCopyCmds = ENV_TEMPLATES.map(({ dest }) =>
     `run cp "${join(staging, dest)}" "${join(target, dest)}"`

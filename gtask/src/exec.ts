@@ -1,4 +1,4 @@
-import { execSync, spawn } from "node:child_process";
+import { execFileSync, execSync, spawn } from "node:child_process";
 import { openSync } from "node:fs";
 
 export function exec(cmd: string, opts?: { cwd?: string }): string {
@@ -14,6 +14,14 @@ export function execSafe(cmd: string, opts?: { cwd?: string }): string {
     return exec(cmd, opts);
   } catch {
     return "";
+  }
+}
+
+export function copyToClipboard(text: string): void {
+  try {
+    execFileSync("pbcopy", [], { input: text, stdio: "ignore" });
+  } catch {
+    // Clipboard integration is optional and must not affect task creation.
   }
 }
 
