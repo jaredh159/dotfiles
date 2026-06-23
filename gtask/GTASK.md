@@ -21,7 +21,9 @@ run with Node's native type stripping (no build step). Zero npm dependencies.
 
 1. Allocates a port slot (0–29) by scanning existing tasks
 2. Writes env files and port/slot config to a tmpdir staging area
-3. Kicks off a background process that:
+3. Spins up a detached tmux session named for the slug, rooted at the task dir,
+   with a single vertical split — ready to jump into (see "Task tmux session")
+4. Kicks off a background process that:
    - Creates per-task databases from `gertrude_sync` template
    - Clones the monorepo, checks out a new branch
    - Copies env files and `.gtask-slot`/`.gtask-ports` into the task dir
@@ -36,6 +38,29 @@ If you start light and later want the full deep-work pass, run `gtask --heavy` f
 that task directory. It backgrounds the same warm-up sequence used by a normal full create.
 
 Returns to the shell immediately — only the staging dir setup is synchronous.
+
+## Task tmux session
+
+Every `create` (full or `--light`) opens a detached tmux session you can jump
+straight into while the warm-up runs in the background:
+
+- **Name:** the slug with any trailing hyphen and tmux-special chars (`.`/`:`)
+  cleaned off — e.g. `gtask daily-email` → session `daily-email`. (The dir is
+  `daily-email-<MMDDYY>`; the session drops the datestamp.)
+- **Layout:** rooted at the task dir with one vertical split (two side-by-side
+  panes), left pane focused.
+- **Detached:** it is created in the background, not attached. Jump in with
+  `tmux attach -t <slug>` (or your session switcher / sessionizer).
+- **Idempotent:** if a session with that name already exists it is left as-is —
+  no duplicate panes, no clobbering.
+- **Best-effort:** if tmux is missing or errors, task creation is unaffected.
+- **Opt out:** set `GTASK_NO_SESSION=1` to skip session creation.
+
+This is distinct from `--sidewatch`, which opens/selects a 3-pane *window* inside
+a single shared `sidewatch` session (for glancing at several tasks at once). The
+per-task session above is a dedicated session meant to be your main workspace for
+that task. Cleanup of either is handled by `--clean`, which kills any tmux pane
+whose path is inside a removed task dir (so the now-empty session is dropped too).
 
 ## What `mothball` does
 
@@ -158,6 +183,7 @@ such as `KEYCHAIN_CRAWLER_URL` and `KEYCHAIN_CRAWLER_AUTH_TOKEN`.
 - `src/sync.ts` — recreate task databases from template
 - `src/psql.ts` — open a task-scoped PostgreSQL shell
 - `src/mothball.ts` — delete regenerable build output to reclaim disk
+- `src/session.ts` — per-task tmux session spawned at create time
 - `src/list.ts` — task directory table listing
 - `src/slot.ts` — slot allocation and port calculation
 - `src/template.ts` — env template resolution

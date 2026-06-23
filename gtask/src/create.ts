@@ -3,6 +3,7 @@ import { join, dirname } from "node:path";
 import { homedir, tmpdir } from "node:os";
 import { makeTargetDir, dbNameFromDir, humanizeSlug } from "./parse.ts";
 import { background, copyToClipboard } from "./exec.ts";
+import { openTaskSession } from "./session.ts";
 import { loadTemplate, resolveTemplate, buildTemplateVars } from "./template.ts";
 import { allocateSlot, portsForSlot, portsFileContent } from "./slot.ts";
 import {
@@ -172,6 +173,10 @@ export async function create(slug: string, opts?: { light?: boolean }): Promise<
 
   copyToClipboard(target);
 
+  // The dir, branch slug, and env files now exist, so spin up a tmux session to
+  // jump into while the warm-up runs in the background. Opt out with GTASK_NO_SESSION.
+  const session = process.env.GTASK_NO_SESSION ? null : openTaskSession(target, slug);
+
   const envCopyCmds = ENV_TEMPLATES.map(({ dest }) =>
     `run cp "${join(staging, dest)}" "${join(target, dest)}"`
   );
@@ -203,4 +208,7 @@ export async function create(slug: string, opts?: { light?: boolean }): Promise<
   background(cmds, { cwd: TASKS_DIR, logFile });
 
   console.log(`Created: ${target}`);
+  if (session) {
+    console.log(`Session: ${session} (tmux attach -t ${session})`);
+  }
 }
