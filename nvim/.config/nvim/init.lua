@@ -8,6 +8,9 @@ vim.g.maplocalleader = " "
 
 -- Recognize .env variants (.env.local, .env.example, etc.) as dotenv files
 vim.filetype.add({
+  extension = {
+    stv = "steve",
+  },
   pattern = {
     ["%.env%..*"] = "sh",
   },
