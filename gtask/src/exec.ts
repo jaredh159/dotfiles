@@ -19,7 +19,7 @@ export function execSafe(cmd: string, opts?: { cwd?: string }): string {
 
 export function copyToClipboard(text: string): void {
   try {
-    execFileSync("pbcopy", [], { input: text, stdio: "ignore" });
+    execFileSync("pbcopy", [], { input: text, stdio: ["pipe", "ignore", "ignore"] });
   } catch {
     // Clipboard integration is optional and must not affect task creation.
   }

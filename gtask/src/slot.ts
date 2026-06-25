@@ -8,6 +8,7 @@ export interface TaskPorts {
   site: number;
   admin: number;
   storybook: number;
+  account: number;
 }
 
 export interface PortsFileOptions {
@@ -21,6 +22,7 @@ export function portsForSlot(slot: number): TaskPorts {
     site: BASE_PORTS.site + slot * 10,
     admin: BASE_PORTS.admin + slot * 10,
     storybook: BASE_PORTS.storybook + slot * 10,
+    account: BASE_PORTS.account + slot * 10,
   };
 }
 
@@ -49,6 +51,7 @@ export function portsFileContent(
     `SITE_PORT=${ports.site}`,
     `ADMIN_PORT=${ports.admin}`,
     `STORYBOOK_PORT=${ports.storybook}`,
+    `ACCOUNT_PORT=${ports.account}`,
   ];
 
   if (options.ngrokSubdomain) {

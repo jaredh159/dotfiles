@@ -44,4 +44,8 @@ export const BASE_PORTS = {
   site: 3000,
   admin: 4243,
   storybook: 6006,
+  // new "account" dashboard (web/dashboard-v2). Base is intentionally non-round
+  // and ends in a digit unused by the others so account + slot*10 never collides
+  // with any other service at any slot.
+  account: 9347,
 };

@@ -1,11 +1,11 @@
 import { execFileSync } from "node:child_process";
+import { basename } from "node:path";
 
-// Derive the tmux session name for a task from its slug. The slug is already
-// validated to lowercase/numbers/single-hyphens, but we defensively strip the
-// chars tmux treats specially in session names ('.' and ':') and drop any
-// trailing hyphen so `my-feature-` → `my-feature`.
-export function taskSessionName(slug: string): string {
-  return slug.replace(/[.:]/g, "-").replace(/-+$/, "");
+// Derive the tmux session name for a task from its directory path.
+// Uses the directory basename to match what tmux-sessionizer.sh derives
+// (SESSION_NAME=$(basename "$SESSION" | tr . _) — task dirs have no dots).
+export function taskSessionName(taskRoot: string): string {
+  return basename(taskRoot);
 }
 
 function tmux(args: string[]): void {
@@ -23,19 +23,23 @@ function sessionExists(name: string): boolean {
 }
 
 // Best-effort: spin up a detached tmux session rooted at the new task dir with a
-// single vertical split (two side-by-side panes), so the task is ready to jump
-// into. Returns the session name, or null if tmux is unavailable or fails — task
-// creation must never break because of tmux.
-export function openTaskSession(taskRoot: string, slug: string): string | null {
-  const name = taskSessionName(slug);
+// single vertical split (two side-by-side panes), left pane focused, so the task
+// is ready to jump into. Task creation must never break because of tmux.
+export function openTaskSession(taskRoot: string): void {
+  const name = taskSessionName(taskRoot);
   try {
-    if (!sessionExists(name)) {
-      tmux(["new-session", "-d", "-s", name, "-c", taskRoot]);
-      tmux(["split-window", "-h", "-t", name, "-c", taskRoot]);
-      tmux(["select-pane", "-t", `${name}.1`]);
-    }
-    return name;
+    if (sessionExists(name)) return;
+    tmux(["new-session", "-d", "-s", name, "-c", taskRoot]);
   } catch {
-    return null;
+    return;
+  }
+  try {
+    // -b creates the new pane BEFORE (to the left of) the existing pane and
+    // focuses it — so we land in the left pane with no select-pane call and
+    // no dependency on base-index / pane-base-index settings.
+    // Note: split-window -t takes a pane target (no = prefix).
+    tmux(["split-window", "-h", "-b", "-t", name, "-c", taskRoot]);
+  } catch {
+    // session exists and is usable even without the split
   }
 }

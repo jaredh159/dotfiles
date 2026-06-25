@@ -175,7 +175,9 @@ export async function create(slug: string, opts?: { light?: boolean }): Promise<
 
   // The dir, branch slug, and env files now exist, so spin up a tmux session to
   // jump into while the warm-up runs in the background. Opt out with GTASK_NO_SESSION.
-  const session = process.env.GTASK_NO_SESSION ? null : openTaskSession(target, slug);
+  if (!process.env.GTASK_NO_SESSION) {
+    openTaskSession(target);
+  }
 
   const envCopyCmds = ENV_TEMPLATES.map(({ dest }) =>
     `run cp "${join(staging, dest)}" "${join(target, dest)}"`
@@ -208,7 +210,4 @@ export async function create(slug: string, opts?: { light?: boolean }): Promise<
   background(cmds, { cwd: TASKS_DIR, logFile });
 
   console.log(`Created: ${target}`);
-  if (session) {
-    console.log(`Session: ${session} (tmux attach -t ${session})`);
-  }
 }

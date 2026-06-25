@@ -10,6 +10,7 @@ describe("portsForSlot", () => {
     assert.strictEqual(ports.site, 3000);
     assert.strictEqual(ports.admin, 4243);
     assert.strictEqual(ports.storybook, 6006);
+    assert.strictEqual(ports.account, 9347);
   });
 
   it("offsets by 10 for slot 1", () => {
@@ -19,6 +20,7 @@ describe("portsForSlot", () => {
     assert.strictEqual(ports.site, 3010);
     assert.strictEqual(ports.admin, 4253);
     assert.strictEqual(ports.storybook, 6016);
+    assert.strictEqual(ports.account, 9357);
   });
 
   it("offsets by 20 for slot 2", () => {
@@ -28,6 +30,7 @@ describe("portsForSlot", () => {
     assert.strictEqual(ports.site, 3020);
     assert.strictEqual(ports.admin, 4263);
     assert.strictEqual(ports.storybook, 6026);
+    assert.strictEqual(ports.account, 9367);
   });
 
   it("handles slot 29 (max)", () => {
@@ -37,6 +40,7 @@ describe("portsForSlot", () => {
     assert.strictEqual(ports.site, 3290);
     assert.strictEqual(ports.admin, 4533);
     assert.strictEqual(ports.storybook, 6296);
+    assert.strictEqual(ports.account, 9637);
   });
 });
 
@@ -49,12 +53,13 @@ describe("portsFileContent", () => {
     assert.ok(content.includes("SITE_PORT=3010"));
     assert.ok(content.includes("ADMIN_PORT=4253"));
     assert.ok(content.includes("STORYBOOK_PORT=6016"));
+    assert.ok(content.includes("ACCOUNT_PORT=9357"));
   });
 
   it("has one variable per line", () => {
     const ports = portsForSlot(0);
     const lines = portsFileContent(ports).trim().split("\n");
-    assert.strictEqual(lines.length, 5);
+    assert.strictEqual(lines.length, 6);
   });
 
   it("includes ngrok subdomain when configured", () => {
@@ -63,6 +68,6 @@ describe("portsFileContent", () => {
       ngrokSubdomain: "sweet-carefully-tarpon",
     }).trim().split("\n");
     assert.ok(lines.includes("NGROK_SUBDOMAIN=sweet-carefully-tarpon"));
-    assert.strictEqual(lines.length, 6);
+    assert.strictEqual(lines.length, 7);
   });
 });
