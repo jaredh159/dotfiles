@@ -5,7 +5,8 @@
       "Edit(*)"
     ],
     "deny": [
-      "AskUserQuestion"
+      "AskUserQuestion",
+      "Workflow"
     ],
     "defaultMode": "acceptEdits"
   },
@@ -28,7 +29,9 @@
     "swift-lsp@claude-plugins-official": true
   },
   "effortLevel": "xhigh",
+  "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "agentPushNotifEnabled": true,
-  "gitAttribution": false
+  "gitAttribution": false,
+  "model": "sonnet"
 }
