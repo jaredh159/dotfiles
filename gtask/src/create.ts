@@ -23,6 +23,7 @@ function writeEnvFiles(stagingDir: string, dbName: string, testDbName: string, p
     TASK_TEST_DATABASE_NAME: testDbName,
     TASK_API_PORT: String(ports.api),
     TASK_DASHBOARD_PORT: String(ports.dash),
+    TASK_ACCOUNT_PORT: String(ports.account),
   });
 
   for (const { template, dest } of ENV_TEMPLATES) {
