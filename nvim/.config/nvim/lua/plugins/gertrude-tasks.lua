@@ -62,25 +62,56 @@ local function get_tasks_sorted_by_mtime()
   return tasks
 end
 
+local function prune_stale_mru_sessions()
+  -- Remove MRU entries whose tmux session is gone AND whose task dir no
+  -- longer exists. Without this the ~/.tmux-mru file accumulates stale
+  -- session names indefinitely: only `gtask --clean` ejects them, so a
+  -- manual `rm -rf` of a task dir (or any removal that bypasses clean)
+  -- would otherwise leave a dangling entry that lingers until the cap
+  -- pushes it out. Returns a fresh resolved lookup built from the pruned
+  -- list so callers don't need a second pass.
+  local sessions = tmux_projects.read_mru_sessions()
+  local kept, lookup = {}, {}
+  for _, session in ipairs(sessions) do
+    if tmux_projects.resolved_path_for_session(session) then
+      table.insert(kept, session)
+      lookup[session] = true
+    end
+  end
+  if #kept ~= #sessions then
+    tmux_projects.write_mru_sessions(kept)
+  end
+  return lookup
+end
+
 local function gertrude_tasks(opts)
   opts = opts or {}
-  local tasks = get_tasks_sorted_by_mtime()
-  local mru_lookup = tmux_projects.read_resolved_mru_lookup()
   local cwd = vim.fn.getcwd()
 
-  -- filter out current task
-  tasks = vim.tbl_filter(function(task)
-    return task.path ~= cwd
-  end, tasks)
+  -- Prune dead MRU entries up front and build the dot-lookup from disk.
+  local mru_lookup = prune_stale_mru_sessions()
 
-  if #tasks == 0 then
+  -- Re-scan the filesystem every time the finder is (re)built so that task
+  -- dirs deleted (or created) after the picker opened are reflected on the
+  -- next refresh, not only on a full close-and-reopen. The MRU lookup is
+  -- kept in memory and mutated by the toggle handlers below, so dots update
+  -- without re-shelling out to tmux on every refresh.
+  local function build_results()
+    local tasks = get_tasks_sorted_by_mtime()
+    tasks = vim.tbl_filter(function(task)
+      return task.path ~= cwd
+    end, tasks)
+    return tasks
+  end
+
+  if #build_results() == 0 then
     vim.notify("No other tasks found", vim.log.levels.WARN)
     return
   end
 
   local function make_finder()
     return finders.new_table({
-      results = tasks,
+      results = build_results(),
       entry_maker = function(entry)
         return {
           value = entry,

@@ -30,7 +30,12 @@
   },
   "effortLevel": "xhigh",
   "tui": "fullscreen",
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
+  },
   "skipDangerousModePermissionPrompt": true,
   "agentPushNotifEnabled": true,
+  "voiceEnabled": true,
   "gitAttribution": false
 }
