@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-export PATH="/opt/homebrew/opt/postgresql@17/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/local/sbin:$PATH"
+# arch-aware brew prefix: /opt/homebrew on Apple Silicon, /usr/local on Intel.
+# resolved via absolute brew paths since PATH isn't set up yet.
+BREW_PREFIX="$(/opt/homebrew/bin/brew --prefix 2>/dev/null || /usr/local/bin/brew --prefix 2>/dev/null || echo /usr/local)"
+
+export PATH="$BREW_PREFIX/opt/postgresql@17/bin:$BREW_PREFIX/bin:$BREW_PREFIX/sbin:/usr/local/bin:/usr/local/sbin:$PATH"
 ENV_FILE="${GERTRUDE_DB_SYNC_ENV_FILE:-$HOME/.dotfiles/secrets.local}"
 
-PGDATA="/opt/homebrew/var/postgresql@17"
+PGDATA="$BREW_PREFIX/var/postgresql@17"
 PGPID="$PGDATA/postmaster.pid"
 PGSERVICE="postgresql@17"
 
@@ -16,7 +20,7 @@ ensure_postgres() {
   if [[ -f "$PGPID" ]]; then
     local pid
     pid=$(head -n 1 "$PGPID" 2>/dev/null || true)
-    if [[ -n "$pid" ]] && ! pgrep -f "/opt/homebrew/.*/postgres.*-D $PGDATA" >/dev/null 2>&1; then
+    if [[ -n "$pid" ]] && ! pgrep -f "postgres.*-D $PGDATA" >/dev/null 2>&1; then
       echo "$(date): Removing stale postmaster.pid (recorded PID $pid is not a live postgres process)"
       rm -f "$PGPID"
     fi

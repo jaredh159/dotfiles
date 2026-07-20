@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+# arch-aware brew prefix: /opt/homebrew on Apple Silicon, /usr/local on Intel.
+BREW_PREFIX="$(/opt/homebrew/bin/brew --prefix 2>/dev/null || /usr/local/bin/brew --prefix 2>/dev/null || echo /usr/local)"
+export PATH="$BREW_PREFIX/bin:$BREW_PREFIX/sbin:/usr/bin:/bin:$PATH"
 
 # Time gating: daily 5am-10pm only
 HOUR=$((10#$(date +%H)))
