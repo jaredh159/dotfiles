@@ -29,7 +29,7 @@ return { -- Autoformat
       end
     end,
     formatters_by_ft = {
-      steve = { "stevefmt" },
+      steve = { "steve_fmt" },
       c = { "clang_format" },
       lua = { "stylua" },
       swift = { "swiftformat" },
@@ -44,9 +44,9 @@ return { -- Autoformat
       typescriptreact = { "prettier", "eslint_d" },
     },
     formatters = {
-      stevefmt = {
-        command = "/Users/jared/.cargo/bin/stevefmt",
-        args = { "--stdin" },
+      steve_fmt = {
+        command = "/Users/jared/.cargo/bin/steve",
+        args = { "fmt", "--stdin" },
         stdin = true,
       },
     },

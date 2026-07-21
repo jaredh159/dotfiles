@@ -3,7 +3,21 @@
 # Cycle through MRU sessions without updating the MRU list
 # Only operates when triggered from Ghostty (not iTerm)
 
-pid=$(tmux display-message -p '#{client_pid}')
+# when invoked by voice (dictator), $TMUX_VOICE_CLIENT pins the target client.
+# display-message -c does NOT scope format expansion, so resolve per-client
+# values via list-clients instead
+client_format() {
+  if [[ -n "${TMUX_VOICE_CLIENT:-}" ]]; then
+    tmux list-clients -F "#{client_tty}"$'\t'"$1" \
+      | awk -F'\t' -v tty="$TMUX_VOICE_CLIENT" '$1 == tty { print $2; exit }'
+  else
+    tmux display-message -p "$1"
+  fi
+}
+client_args=()
+[[ -n "${TMUX_VOICE_CLIENT:-}" ]] && client_args=(-c "$TMUX_VOICE_CLIENT")
+
+pid=$(client_format '#{client_pid}')
 while [[ $pid -gt 1 ]]; do
   case "$(ps -o comm= -p "$pid" 2>/dev/null)" in *ghostty*) break ;; esac
   pid=$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d ' ')
@@ -17,7 +31,7 @@ if [[ ! -f "$MRU_FILE" ]]; then
   exit 0
 fi
 
-current_session=$(tmux display-message -p '#S')
+current_session=$(client_format '#{client_session}')
 
 # Read MRU into array, filter to only existing sessions
 sessions=()
@@ -54,4 +68,4 @@ target_session="${sessions[$next_idx]}"
 tmux set-environment -g TMUX_MRU_SKIP "$target_session"
 
 # Switch to target session
-tmux switch-client -t "$target_session"
+tmux switch-client "${client_args[@]}" -t "$target_session"

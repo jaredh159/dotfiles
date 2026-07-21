@@ -1,0 +1,147 @@
+# always-on voice command mode for dictator
+# phrases are matched against the *end* of what you say, so filler before
+# a command is fine ("um, go left" matches "left"). longest phrase wins.
+# edit here (stowed from ~/.dotfiles), restart Dictator to reload.
+#
+# dictator resolves the *focused* tmux client before each command and exports
+# $TMUX_VOICE_CLIENT (tty) and $TMUX_VOICE_SESSION (its session name), so
+# commands act on the window you're looking at, not tmux's guess.
+
+always_on = true
+toggle_hotkey = "cmd-shift-m"
+
+# voice-pause matching (e.g. before a call, or talking to a human):
+# "go to sleep" -> only "wake up" is matched until you say it
+sleep_phrases = ["go to sleep"]
+wake_phrases = ["wake up"]
+
+[dictation]
+# "record" posts spokenly's toggle shortcut, then dictator ignores everything
+# except stop_phrases until you finish. say the stop phrase to post the
+# shortcut again — spokenly then inserts the text at the cursor.
+start_phrases = ["record", "start recording"]
+stop_phrases = ["stop recording", "finish recording"]
+# like stop, but after spokenly's transcript lands (detected via clipboard),
+# submit_command fires — say "send it" to dictate-and-submit in one breath
+send_phrases = ["over and out"]
+submit_command = "tmux send-keys -t \"=$TMUX_VOICE_SESSION:\" Enter"
+# escape hatch when dictator wrongly thinks spokenly is recording: resets
+# state without posting the shortcut. dictation state also self-expires.
+cancel_phrases = ["cancel dictation"]
+timeout_seconds = 240
+spokenly_shortcut = "cmd-shift-o"
+
+# ── panes ──────────────────────────────────────────────
+
+[[command]]
+phrases = ["left", "pane left"]
+run = "tmux select-pane -L -t \"=$TMUX_VOICE_SESSION:\""
+
+[[command]]
+phrases = ["right", "pane right"]
+run = "tmux select-pane -R -t \"=$TMUX_VOICE_SESSION:\""
+
+[[command]]
+phrases = ["up", "top", "pane up"]
+run = "tmux select-pane -U -t \"=$TMUX_VOICE_SESSION:\""
+
+[[command]]
+phrases = ["down", "bottom", "pane down"]
+run = "tmux select-pane -D -t \"=$TMUX_VOICE_SESSION:\""
+
+[[command]]
+phrases = ["other pane", "last pane"]
+run = "tmux last-pane -t \"=$TMUX_VOICE_SESSION:\""
+
+[[command]]
+phrases = ["zoom"]
+run = "tmux resize-pane -Z -t \"=$TMUX_VOICE_SESSION:\""
+
+# -c keeps the new pane in the split-from pane's cwd (otherwise panes created
+# from outside a client inherit the tmux server's cwd, which is /)
+[[command]]
+phrases = ["split right", "split write"]
+run = "tmux split-window -h -t \"=$TMUX_VOICE_SESSION:\" -c '#{pane_current_path}'"
+
+[[command]]
+phrases = ["split down", "split bottom"]
+run = "tmux split-window -v -t \"=$TMUX_VOICE_SESSION:\" -c '#{pane_current_path}'"
+
+[[command]]
+phrases = ["close pane", "kill pane"]
+run = "tmux kill-pane -t \"=$TMUX_VOICE_SESSION:\""
+
+# ── windows ────────────────────────────────────────────
+
+[[command]]
+phrases = ["window one"]
+run = "tmux select-window -t \"=$TMUX_VOICE_SESSION:1\""
+
+[[command]]
+phrases = ["window two"]
+run = "tmux select-window -t \"=$TMUX_VOICE_SESSION:2\""
+
+[[command]]
+phrases = ["window three"]
+run = "tmux select-window -t \"=$TMUX_VOICE_SESSION:3\""
+
+[[command]]
+phrases = ["window four"]
+run = "tmux select-window -t \"=$TMUX_VOICE_SESSION:4\""
+
+[[command]]
+phrases = ["window five"]
+run = "tmux select-window -t \"=$TMUX_VOICE_SESSION:5\""
+
+[[command]]
+phrases = ["next window"]
+run = "tmux next-window -t \"=$TMUX_VOICE_SESSION\""
+
+[[command]]
+phrases = ["previous window"]
+run = "tmux previous-window -t \"=$TMUX_VOICE_SESSION\""
+
+# ── sessions (MRU stack) ───────────────────────────────
+
+[[command]]
+phrases = ["cycle", "next session"]
+run = "$HOME/.local/scripts/tmux-mru-cycle"
+
+[[command]]
+phrases = ["eject", "eject session"]
+run = "$HOME/.local/scripts/tmux-mru-eject"
+
+# capture command: words after the phrase become $VOICE_ARG —
+# "open session voxxy" fuzzy-matches your project dirs via the sessionizer
+[[command]]
+phrases = ["open session"]
+capture = true
+run = "$HOME/.local/scripts/tmux-sessionizer.sh \"$VOICE_ARG\""
+
+[[command]]
+phrases = ["alternate", "last session"]
+run = "tmux switch-client -l -c \"$TMUX_VOICE_CLIENT\""
+
+# ── app focus ──────────────────────────────────────────
+
+[[command]]
+phrases = ["browser"]
+run = "open -a Arc"
+
+[[command]]
+phrases = ["ghostty", "ghosty", "terminal"]
+run = "open -a Ghostty"
+
+[[command]]
+phrases = ["watcher"]
+run = "open -a iTerm"
+
+# ── keys into the active pane ──────────────────────────
+
+[[command]]
+phrases = ["submit", "press enter"]
+run = "tmux send-keys -t \"=$TMUX_VOICE_SESSION:\" Enter"
+
+[[command]]
+phrases = ["escape", "interrupt"]
+run = "tmux send-keys -t \"=$TMUX_VOICE_SESSION:\" Escape"
